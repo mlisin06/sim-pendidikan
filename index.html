@@ -29,8 +29,8 @@
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold items-center">
-                <a href="index.html" class="bg-blue-800 text-white py-1 px-3 rounded">Dashboard Rekap</a>
-                <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 px-3 py-1 rounded font-bold transition">
+                <a href="index.html" class="bg-blue-800 text-white py-1.5 px-3 rounded">Dashboard Rekap</a>
+                <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 px-3 py-1.5 rounded font-bold transition">
                     <i class="fa-solid fa-lock mr-1"></i> Panel Admin
                 </a>
             </nav>
@@ -83,7 +83,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
                 <div class="p-3 bg-blue-100 text-blue-700 rounded-lg text-xl"><i class="fa-solid fa-user-graduate"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Total Siswa Active</span>
+                    <span class="text-[11px] text-gray-500 block">Total Siswa Aktif</span>
                     <span id="stat-siswa" class="text-xl font-extrabold text-blue-900">0</span>
                 </div>
             </div>
@@ -145,22 +145,23 @@
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
                 <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
-                <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
+                <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN / NIK..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
-                            <th class="py-2.5 px-3 border">NISN</th>
+                            <th class="py-2.5 px-3 border">NISN / NIPD</th>
                             <th class="py-2.5 px-3 border">Nama Lengkap</th>
                             <th class="py-2.5 px-3 border">JK</th>
                             <th class="py-2.5 px-3 border">Kelas</th>
+                            <th class="py-2.5 px-3 border">TTL</th>
                             <th class="py-2.5 px-3 border">Fisik (TB / BB / LK)</th>
                             <th class="py-2.5 px-3 border">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-daftar-siswa-rekap" class="divide-y text-xs">
-                        <tr><td colspan="6" class="text-center py-6 text-gray-400">Memuat data siswa...</td></tr>
+                        <tr><td colspan="7" class="text-center py-6 text-gray-400">Memuat data siswa...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -190,14 +191,14 @@
 
     </main>
 
-    <!-- Modal Detail Siswa -->
+    <!-- Modal Detail Lengkap Siswa (Seluruh Kolom Dapodik) -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
-                <h4 class="font-bold text-sm" id="m-title">Detail Lengkap Siswa</h4>
+                <h4 class="font-bold text-sm" id="m-title">Detail Lengkap Data Dapodik Siswa</h4>
                 <button onclick="closeModal()" class="text-white hover:text-red-300 font-bold text-lg">&times;</button>
             </div>
-            <div id="m-content" class="p-6 overflow-y-auto text-xs space-y-3"></div>
+            <div id="m-content" class="p-6 overflow-y-auto text-xs space-y-4"></div>
             <div class="bg-gray-100 p-3 text-right">
                 <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-1.5 rounded text-xs">Tutup</button>
             </div>
@@ -329,21 +330,22 @@
                         }
                     }
 
-                    // Filter Tabel Siswa Bawah
+                    // Filter Tabel Siswa
                     const matchKelas = selectedKelas === "" || rombelStr.includes(selectedKelas);
-                    const matchSearch = (s.nama || '').toLowerCase().includes(searchQuery) || (s.nisn || '').toString().includes(searchQuery);
+                    const matchSearch = (s.nama || '').toLowerCase().includes(searchQuery) || (s.nisn || '').toString().includes(searchQuery) || (s.nik || '').toString().includes(searchQuery);
 
                     if(matchKelas && matchSearch) {
                         filteredSiswaCount++;
                         tbodySiswa.innerHTML += `
                             <tr class="hover:bg-blue-50/40">
-                                <td class="py-2 px-3 border font-mono">${s.nisn || '-'}</td>
-                                <td class="py-2 px-3 border font-bold text-gray-900">${s.nama || '-'}</td>
-                                <td class="py-2 px-3 border">${s.jk || '-'}</td>
-                                <td class="py-2 px-3 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
-                                <td class="py-2 px-3 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
-                                <td class="py-2 px-3 border">
-                                    <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[10px]">Detail</button>
+                                <td class="py-2.5 px-3 border font-mono">${s.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIPD: ${s.nipd || '-'}</span></td>
+                                <td class="py-2.5 px-3 border font-bold text-gray-900">${s.nama || '-'}</td>
+                                <td class="py-2.5 px-3 border">${s.jk || '-'}</td>
+                                <td class="py-2.5 px-3 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
+                                <td class="py-2.5 px-3 border">${s.tempat_lahir || ''}, ${s.tgl_lahir || ''}</td>
+                                <td class="py-2.5 px-3 border">${s.tb || '-'} cm / ${s.bb || '-'} kg / ${s.lingkar_kepala || '-'} cm</td>
+                                <td class="py-2.5 px-3 border">
+                                    <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[10px] font-semibold">Detail</button>
                                 </td>
                             </tr>
                         `;
@@ -352,7 +354,7 @@
             });
 
             if(filteredSiswaCount === 0) {
-                tbodySiswa.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
+                tbodySiswa.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
             }
 
             document.getElementById('stat-siswa').innerText = totalSiswaPeriode;
@@ -390,35 +392,123 @@
 
         document.getElementById('search-siswa-rekap').addEventListener('input', updateDashboard);
 
+        // Tampilkan Detail Lengkap Seluruh Atribut Template Excel
         function showDetail(key) {
             const s = allSiswa[key];
             if(!s) return;
-            document.getElementById('m-title').innerText = `Detail Data: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
-            document.getElementById('m-content').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="bg-blue-50 p-3 rounded border">
-                        <h5 class="font-bold text-blue-900 border-b pb-1 mb-1">Informasi Akademik</h5>
-                        <p><b>Periode:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
-                        <p><b>Nama:</b> ${s.nama}</p>
-                        <p><b>NISN / NIPD:</b> ${s.nisn} / ${s.nipd || '-'}</p>
-                        <p><b>Rombel:</b> ${s.rombel || s.kelas || '-'}</p>
-                        <p><b>JK / Agama:</b> ${s.jk} / ${s.agama || '-'}</p>
+            
+            document.getElementById('m-title').innerText = `Detail Data Dapodik: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
+            
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- 1. Identitas Utama & Akademik -->
+                    <div class="bg-blue-50/70 p-3.5 rounded-lg border border-blue-200">
+                        <h5 class="font-bold text-blue-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-id-card mr-1"></i> 1. Identitas & Akademik</h5>
+                        <div class="space-y-1">
+                            <p><b>Periode:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
+                            <p><b>Nama Lengkap:</b> ${s.nama || '-'}</p>
+                            <p><b>NISN / NIPD:</b> ${s.nisn || '-'} / ${s.nipd || '-'}</p>
+                            <p><b>NIK:</b> ${s.nik || '-'}</p>
+                            <p><b>JK / Agama:</b> ${s.jk || '-'} / ${s.agama || '-'}</p>
+                            <p><b>TTL:</b> ${s.tempat_lahir || '-'}, ${s.tgl_lahir || '-'}</p>
+                            <p><b>Rombel / Kelas:</b> <span class="font-bold text-blue-800">${s.rombel || s.kelas || '-'}</span></p>
+                            <p><b>No. Reg Akta Lahir:</b> ${s.akta || '-'}</p>
+                            <p><b>Sekolah Asal:</b> ${s.sekolah_asal || '-'}</p>
+                        </div>
                     </div>
-                    <div class="bg-purple-50 p-3 rounded border">
-                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-1">Perkembangan Fisik</h5>
-                        <p><b>Tinggi Badan:</b> ${s.tb || '-'} cm</p>
-                        <p><b>Berat Badan:</b> ${s.bb || '-'} kg</p>
-                        <p><b>Lingkar Kepala:</b> ${s.lingkar_kepala || '-'} cm</p>
-                        <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
+
+                    <!-- 2. Fisik & Informasi Tambahan -->
+                    <div class="bg-purple-50/70 p-3.5 rounded-lg border border-purple-200">
+                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Fisik & Informasi Tambahan</h5>
+                        <div class="space-y-1">
+                            <p><b>Tinggi Badan:</b> <span class="font-bold text-purple-900">${s.tb || '-'} cm</span></p>
+                            <p><b>Berat Badan:</b> <span class="font-bold text-purple-900">${s.bb || '-'} kg</span></p>
+                            <p><b>Lingkar Kepala:</b> <span class="font-bold text-purple-900">${s.lingkar_kepala || '-'} cm</span></p>
+                            <p><b>Anak Ke- / Jml Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
+                            <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
+                            <p><b>Jenis Tinggal:</b> ${s.jenis_tinggal || '-'}</p>
+                            <p><b>Alat Transportasi:</b> ${s.transportasi || '-'}</p>
+                            <p><b>Jarak ke Sekolah:</b> ${s.jarak_sekolah || '-'} KM</p>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-3 rounded border md:col-span-2">
-                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-1">Kontak & Orang Tua</h5>
-                        <p><b>Alamat:</b> ${s.alamat || '-'} RT ${s.rt||'-'}/RW ${s.rw||'-'}, ${s.kelurahan||'-'}</p>
-                        <p><b>Ayah:</b> ${s.nama_ayah || '-'} | <b>Ibu:</b> ${s.nama_ibu || '-'}</p>
-                        <p><b>Penerima PIP / KIP:</b> ${s.penerima_kip || s.layak_pip || '-'}</p>
+
+                    <!-- 3. Alamat Lengkap & Koordinat -->
+                    <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200 md:col-span-2">
+                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat Lengkap & Koordinat</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div>
+                                <p><b>Jalan / Dusun:</b> ${s.alamat || '-'} (${s.dusun || '-'})</p>
+                                <p><b>RT / RW:</b> RT ${s.rt || '-'}/RW ${s.rw || '-'}</p>
+                                <p><b>Desa / Kelurahan:</b> ${s.kelurahan || '-'}</p>
+                                <p><b>Kecamatan / Kode Pos:</b> ${s.kecamatan || '-'} (${s.kode_pos || '-'})</p>
+                            </div>
+                            <div>
+                                <p><b>No. HP / Telepon:</b> ${s.hp || '-'} / ${s.telepon || '-'}</p>
+                                <p><b>E-Mail:</b> ${s.email || '-'}</p>
+                                <p><b>Koordinat Lintang:</b> ${s.lintang || '-'}</p>
+                                <p><b>Koordinat Bujur:</b> ${s.bujur || '-'}</p>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- 4. Data Orang Tua & Wali -->
+                    <div class="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200 md:col-span-2">
+                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua & Wali</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="bg-white p-2 rounded border">
+                                <span class="font-bold text-blue-900 block border-b pb-0.5 mb-1">A. Ayah Kandung</span>
+                                <p><b>Nama / NIK:</b> ${s.nama_ayah || '-'} (${s.nik_ayah || '-'})</p>
+                                <p><b>Thn Lahir:</b> ${s.thn_ayah || '-'}</p>
+                                <p><b>Pendidikan:</b> ${s.pend_ayah || '-'}</p>
+                                <p><b>Pekerjaan:</b> ${s.kerja_ayah || '-'}</p>
+                                <p><b>Penghasilan:</b> ${s.hasil_ayah || '-'}</p>
+                            </div>
+                            <div class="bg-white p-2 rounded border">
+                                <span class="font-bold text-pink-900 block border-b pb-0.5 mb-1">B. Ibu Kandung</span>
+                                <p><b>Nama / NIK:</b> ${s.nama_ibu || s.ibu || '-'} (${s.nik_ibu || '-'})</p>
+                                <p><b>Thn Lahir:</b> ${s.thn_ibu || '-'}</p>
+                                <p><b>Pendidikan:</b> ${s.pend_ibu || '-'}</p>
+                                <p><b>Pekerjaan:</b> ${s.kerja_ibu || '-'}</p>
+                                <p><b>Penghasilan:</b> ${s.hasil_ibu || '-'}</p>
+                            </div>
+                            <div class="bg-white p-2 rounded border">
+                                <span class="font-bold text-gray-800 block border-b pb-0.5 mb-1">C. Wali (Opsional)</span>
+                                <p><b>Nama / NIK:</b> ${s.nama_wali || '-'} (${s.nik_wali || '-'})</p>
+                                <p><b>Thn Lahir:</b> ${s.thn_wali || '-'}</p>
+                                <p><b>Pendidikan:</b> ${s.pend_wali || '-'}</p>
+                                <p><b>Pekerjaan:</b> ${s.kerja_wali || '-'}</p>
+                                <p><b>Penghasilan:</b> ${s.hasil_wali || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Dokumen, Bantuan & Bank -->
+                    <div class="bg-emerald-50/60 p-3.5 rounded-lg border border-emerald-200 md:col-span-2">
+                        <h5 class="font-bold text-emerald-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Dokumen Kelulusan, Bantuan PIP/KIP & Rekening Bank</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <p><b>No Peserta UN:</b> ${s.no_un || '-'}</p>
+                                <p><b>No Seri Ijazah:</b> ${s.no_ijazah || '-'}</p>
+                                <p><b>No SKHUN:</b> ${s.skhun || '-'}</p>
+                            </div>
+                            <div>
+                                <p><b>Penerima KPS / No KPS:</b> ${s.penerima_kps || '-'} / ${s.no_kps || '-'}</p>
+                                <p><b>Penerima KIP / No KIP:</b> ${s.penerima_kip || '-'} / ${s.no_kip || '-'}</p>
+                                <p><b>Nama di KIP / No KKS:</b> ${s.nama_kip || '-'} / ${s.no_kks || '-'}</p>
+                                <p><b>Layak PIP / Alasan:</b> ${s.layak_pip || '-'} (${s.alasan_pip || '-'})</p>
+                            </div>
+                            <div>
+                                <p><b>Bank / No Rekening:</b> ${s.bank || '-'} - ${s.norek || '-'}</p>
+                                <p><b>Rekening Atas Nama:</b> ${s.an_bank || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             `;
+            
+            document.getElementById('m-content').innerHTML = html;
             document.getElementById('modal-detail').classList.remove('hidden');
         }
 
