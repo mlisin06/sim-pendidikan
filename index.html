@@ -42,8 +42,8 @@
         <!-- PANEL FILTER PERIODE GLOBAL -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik</h2>
-                <p class="text-xs text-gray-500">Pilih Tahun Pelajaran, Semester, dan Kelas untuk memfilter data rekap dan daftar siswa.</p>
+                <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik & Mutasi</h2>
+                <p class="text-xs text-gray-500">Pilih Tahun Pelajaran, Semester, dan Kelas untuk memfilter data rekap, daftar siswa, dan mutasi.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
@@ -53,7 +53,6 @@
                         <option value="2026/2027">2026/2027</option>
                         <option value="2027/2028">2027/2028</option>
                         <option value="2028/2029">2028/2029</option>
-                        <option value="2029/2030">2029/2030</option>
                     </select>
                 </div>
                 <div>
@@ -79,33 +78,47 @@
         </div>
 
         <!-- KARTU RINGKASAN UTAMA -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
-                <div class="p-3 bg-blue-100 text-blue-700 rounded-lg text-xl"><i class="fa-solid fa-user-graduate"></i></div>
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-blue-100 text-blue-700 rounded-lg text-lg"><i class="fa-solid fa-user-graduate"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Total Siswa Aktif</span>
-                    <span id="stat-siswa" class="text-xl font-extrabold text-blue-900">0</span>
+                    <span class="text-[10px] text-gray-500 block">Siswa Aktif</span>
+                    <span id="stat-siswa" class="text-lg font-extrabold text-blue-900">0</span>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-emerald-100 text-emerald-700 rounded-lg text-lg"><i class="fa-solid fa-right-to-bracket"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Guru & Tendik</span>
-                    <span id="stat-guru" class="text-xl font-extrabold text-green-900">0</span>
+                    <span class="text-[10px] text-gray-500 block">Mutasi Masuk</span>
+                    <span id="stat-mutasi-masuk" class="text-lg font-extrabold text-emerald-800">0</span>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
-                <div class="p-3 bg-yellow-100 text-yellow-800 rounded-lg text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-rose-100 text-rose-700 rounded-lg text-lg"><i class="fa-solid fa-right-from-bracket"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Penerima PIP</span>
-                    <span id="stat-pip" class="text-xl font-extrabold text-yellow-700">0</span>
+                    <span class="text-[10px] text-gray-500 block">Mutasi Keluar</span>
+                    <span id="stat-mutasi-keluar" class="text-lg font-extrabold text-rose-800">0</span>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
-                <div class="p-3 bg-purple-100 text-purple-700 rounded-lg text-xl"><i class="fa-solid fa-boxes-packing"></i></div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-green-100 text-green-700 rounded-lg text-lg"><i class="fa-solid fa-chalkboard-user"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Total Sarpras</span>
-                    <span id="stat-sarpras" class="text-xl font-extrabold text-purple-900">0</span>
+                    <span class="text-[10px] text-gray-500 block">Guru & Tendik</span>
+                    <span id="stat-guru" class="text-lg font-extrabold text-green-900">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-yellow-100 text-yellow-800 rounded-lg text-lg"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <div>
+                    <span class="text-[10px] text-gray-500 block">Penerima PIP</span>
+                    <span id="stat-pip" class="text-lg font-extrabold text-yellow-700">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-2.5 bg-purple-100 text-purple-700 rounded-lg text-lg"><i class="fa-solid fa-boxes-packing"></i></div>
+                <div>
+                    <span class="text-[10px] text-gray-500 block">Total Sarpras</span>
+                    <span id="stat-sarpras" class="text-lg font-extrabold text-purple-900">0</span>
                 </div>
             </div>
         </div>
@@ -123,7 +136,7 @@
                             <th class="py-2 px-3 border text-left">Rombel / Kelas</th>
                             <th class="py-2 px-3 border bg-blue-800">Laki-Laki (L)</th>
                             <th class="py-2 px-3 border bg-pink-800">Perempuan (P)</th>
-                            <th class="py-2 px-3 border bg-blue-950">Total Siswa</th>
+                            <th class="py-2 px-3 border bg-blue-950">Total Siswa Aktif</th>
                             <th class="py-2 px-3 border bg-yellow-700">Penerima PIP</th>
                         </tr>
                     </thead>
@@ -141,10 +154,35 @@
             </div>
         </div>
 
-        <!-- DAFTAR SISWA SESUAI FILTER (LIHAT DETAIL SAJA) -->
+        <!-- REKAPITULASI MUTASI SISWA (MASUK & KELUAR) -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-gray-900"><i class="fa-solid fa-arrows-rotate text-blue-700 mr-2"></i>Rekapitulasi Mutasi Siswa (Masuk & Keluar)</h3>
+                <span class="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded" id="lbl-rekap-mutasi-periode">2025/2026 - Ganjil</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="py-2 px-3 border">Jenis Mutasi</th>
+                            <th class="py-2 px-3 border">Tgl Mutasi</th>
+                            <th class="py-2 px-3 border">NISN / Nama Siswa</th>
+                            <th class="py-2 px-3 border">Kelas</th>
+                            <th class="py-2 px-3 border">Sekolah Asal / Tujuan</th>
+                            <th class="py-2 px-3 border">Alasan Mutasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-rekap-mutasi" class="divide-y text-xs">
+                        <tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data mutasi pada periode ini.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DAFTAR SISWA AKTIF SESUAI FILTER -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
-                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
+                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Aktif Sesuai Filter</h3>
                 <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN / NIK..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
             </div>
             <div class="overflow-x-auto">
@@ -191,7 +229,7 @@
 
     </main>
 
-    <!-- Modal Detail Lengkap Siswa (Seluruh Kolom Dapodik) -->
+    <!-- Modal Detail Lengkap Seluruh 68 Kolom -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -227,6 +265,7 @@
         const db = firebase.database();
 
         let allSiswa = {};
+        let allMutasi = {};
         let chartPIPInstance = null;
         let chartJKInstance = null;
         let chartUsiaInstance = null;
@@ -265,6 +304,11 @@
             updateDashboard();
         });
 
+        db.ref('mutasi').on('value', snapshot => {
+            allMutasi = snapshot.val() || {};
+            updateDashboard();
+        });
+
         db.ref('guru').on('value', snapshot => {
             document.getElementById('stat-guru').innerText = Object.keys(snapshot.val() || {}).length;
         });
@@ -280,6 +324,7 @@
             const searchQuery = document.getElementById('search-siswa-rekap').value.toLowerCase();
 
             document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP} - ${selectedSMT}`;
+            document.getElementById('lbl-rekap-mutasi-periode').innerText = `${selectedTP} - ${selectedSMT}`;
 
             const siswaKeys = Object.keys(allSiswa);
             let totalSiswaPeriode = 0, countPIP = 0, countL = 0, countP = 0;
@@ -295,8 +340,9 @@
                 const s = allSiswa[k];
                 const sTP = s.tahun_pelajaran || "2025/2026";
                 const sSMT = s.semester || "Ganjil";
+                const statusSiswa = s.status || "Aktif";
 
-                if (sTP === selectedTP && sSMT === selectedSMT) {
+                if (sTP === selectedTP && sSMT === selectedSMT && statusSiswa === "Aktif") {
                     totalSiswaPeriode++;
                     const jk = (s.jk || '').toUpperCase();
                     const isL = (jk === 'L' || jk === 'LAKI-LAKI');
@@ -330,7 +376,7 @@
                         }
                     }
 
-                    // Filter Tabel Siswa
+                    // Filter Tabel Siswa Bawah
                     const matchKelas = selectedKelas === "" || rombelStr.includes(selectedKelas);
                     const matchSearch = (s.nama || '').toLowerCase().includes(searchQuery) || (s.nisn || '').toString().includes(searchQuery) || (s.nik || '').toString().includes(searchQuery);
 
@@ -354,7 +400,7 @@
             });
 
             if(filteredSiswaCount === 0) {
-                tbodySiswa.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
+                tbodySiswa.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400">Tidak ada data siswa aktif yang cocok.</td></tr>';
             }
 
             document.getElementById('stat-siswa').innerText = totalSiswaPeriode;
@@ -388,21 +434,57 @@
             if(chartPIPInstance) { chartPIPInstance.data.datasets[0].data = rekapKelas.map(r => r[3]); chartPIPInstance.update(); }
             if(chartJKInstance) { chartJKInstance.data.datasets[0].data = [countL, countP]; chartJKInstance.update(); }
             if(chartUsiaInstance) { chartUsiaInstance.data.datasets[0].data = usiaCounts; chartUsiaInstance.update(); }
+
+            renderMutasiRekap(selectedTP, selectedSMT);
+        }
+
+        function renderMutasiRekap(tp, smt) {
+            const tbodyMutasi = document.getElementById('tbl-rekap-mutasi');
+            tbodyMutasi.innerHTML = '';
+
+            const keys = Object.keys(allMutasi);
+            let countMasuk = 0, countKeluar = 0, rowCount = 0;
+
+            keys.forEach(k => {
+                const m = allMutasi[k];
+                if((m.tahun_pelajaran || "2025/2026") === tp && (m.semester || "Ganjil") === smt) {
+                    rowCount++;
+                    const isMasuk = m.jenis_mutasi === "Masuk";
+                    if(isMasuk) countMasuk++; else countKeluar++;
+
+                    const badgeClass = isMasuk ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
+
+                    tbodyMutasi.innerHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 border font-bold"><span class="px-2 py-0.5 rounded ${badgeClass}">${m.jenis_mutasi}</span></td>
+                            <td class="py-2 px-3 border font-mono">${m.tgl_mutasi || '-'}</td>
+                            <td class="py-2 px-3 border font-bold text-gray-900">${m.nama_siswa || '-'}<br><span class="text-[10px] text-gray-400 font-mono">NISN: ${m.nisn || '-'}</span></td>
+                            <td class="py-2 px-3 border font-bold text-blue-800">${m.rombel || '-'}</td>
+                            <td class="py-2 px-3 border">${m.sekolah_tujuan_asal || '-'}</td>
+                            <td class="py-2 px-3 border text-gray-600">${m.alasan || '-'}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(rowCount === 0) {
+                tbodyMutasi.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Tidak ada data mutasi pada periode ini.</td></tr>';
+            }
+
+            document.getElementById('stat-mutasi-masuk').innerText = countMasuk;
+            document.getElementById('stat-mutasi-keluar').innerText = countKeluar;
         }
 
         document.getElementById('search-siswa-rekap').addEventListener('input', updateDashboard);
 
-        // Tampilkan Detail Lengkap Seluruh Atribut Template Excel
         function showDetail(key) {
             const s = allSiswa[key];
             if(!s) return;
-            
+
             document.getElementById('m-title').innerText = `Detail Data Dapodik: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
-            
+
             let html = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- 1. Identitas Utama & Akademik -->
                     <div class="bg-blue-50/70 p-3.5 rounded-lg border border-blue-200">
                         <h5 class="font-bold text-blue-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-id-card mr-1"></i> 1. Identitas & Akademik</h5>
                         <div class="space-y-1">
@@ -418,7 +500,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. Fisik & Informasi Tambahan -->
                     <div class="bg-purple-50/70 p-3.5 rounded-lg border border-purple-200">
                         <h5 class="font-bold text-purple-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Fisik & Informasi Tambahan</h5>
                         <div class="space-y-1">
@@ -433,7 +514,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. Alamat Lengkap & Koordinat -->
                     <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200 md:col-span-2">
                         <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat Lengkap & Koordinat</h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -446,68 +526,52 @@
                             <div>
                                 <p><b>No. HP / Telepon:</b> ${s.hp || '-'} / ${s.telepon || '-'}</p>
                                 <p><b>E-Mail:</b> ${s.email || '-'}</p>
-                                <p><b>Koordinat Lintang:</b> ${s.lintang || '-'}</p>
-                                <p><b>Koordinat Bujur:</b> ${s.bujur || '-'}</p>
+                                <p><b>Koordinat Lintang / Bujur:</b> ${s.lintang || '-'} / ${s.bujur || '-'}</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. Data Orang Tua & Wali -->
                     <div class="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200 md:col-span-2">
                         <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua & Wali</h5>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="bg-white p-2 rounded border">
                                 <span class="font-bold text-blue-900 block border-b pb-0.5 mb-1">A. Ayah Kandung</span>
                                 <p><b>Nama / NIK:</b> ${s.nama_ayah || '-'} (${s.nik_ayah || '-'})</p>
-                                <p><b>Thn Lahir:</b> ${s.thn_ayah || '-'}</p>
-                                <p><b>Pendidikan:</b> ${s.pend_ayah || '-'}</p>
                                 <p><b>Pekerjaan:</b> ${s.kerja_ayah || '-'}</p>
-                                <p><b>Penghasilan:</b> ${s.hasil_ayah || '-'}</p>
                             </div>
                             <div class="bg-white p-2 rounded border">
                                 <span class="font-bold text-pink-900 block border-b pb-0.5 mb-1">B. Ibu Kandung</span>
                                 <p><b>Nama / NIK:</b> ${s.nama_ibu || s.ibu || '-'} (${s.nik_ibu || '-'})</p>
-                                <p><b>Thn Lahir:</b> ${s.thn_ibu || '-'}</p>
-                                <p><b>Pendidikan:</b> ${s.pend_ibu || '-'}</p>
                                 <p><b>Pekerjaan:</b> ${s.kerja_ibu || '-'}</p>
-                                <p><b>Penghasilan:</b> ${s.hasil_ibu || '-'}</p>
                             </div>
                             <div class="bg-white p-2 rounded border">
                                 <span class="font-bold text-gray-800 block border-b pb-0.5 mb-1">C. Wali (Opsional)</span>
                                 <p><b>Nama / NIK:</b> ${s.nama_wali || '-'} (${s.nik_wali || '-'})</p>
-                                <p><b>Thn Lahir:</b> ${s.thn_wali || '-'}</p>
-                                <p><b>Pendidikan:</b> ${s.pend_wali || '-'}</p>
                                 <p><b>Pekerjaan:</b> ${s.kerja_wali || '-'}</p>
-                                <p><b>Penghasilan:</b> ${s.hasil_wali || '-'}</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 5. Dokumen, Bantuan & Bank -->
                     <div class="bg-emerald-50/60 p-3.5 rounded-lg border border-emerald-200 md:col-span-2">
-                        <h5 class="font-bold text-emerald-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Dokumen Kelulusan, Bantuan PIP/KIP & Rekening Bank</h5>
+                        <h5 class="font-bold text-emerald-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Dokumen, Bantuan PIP/KIP & Bank</h5>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
                                 <p><b>No Peserta UN:</b> ${s.no_un || '-'}</p>
-                                <p><b>No Seri Ijazah:</b> ${s.no_ijazah || '-'}</p>
-                                <p><b>No SKHUN:</b> ${s.skhun || '-'}</p>
+                                <p><b>No Seri Ijazah / SKHUN:</b> ${s.no_ijazah || '-'} / ${s.skhun || '-'}</p>
                             </div>
                             <div>
-                                <p><b>Penerima KPS / No KPS:</b> ${s.penerima_kps || '-'} / ${s.no_kps || '-'}</p>
-                                <p><b>Penerima KIP / No KIP:</b> ${s.penerima_kip || '-'} / ${s.no_kip || '-'}</p>
-                                <p><b>Nama di KIP / No KKS:</b> ${s.nama_kip || '-'} / ${s.no_kks || '-'}</p>
                                 <p><b>Layak PIP / Alasan:</b> ${s.layak_pip || '-'} (${s.alasan_pip || '-'})</p>
+                                <p><b>Penerima KIP / No KIP:</b> ${s.penerima_kip || '-'} / ${s.no_kip || '-'}</p>
                             </div>
                             <div>
                                 <p><b>Bank / No Rekening:</b> ${s.bank || '-'} - ${s.norek || '-'}</p>
-                                <p><b>Rekening Atas Nama:</b> ${s.an_bank || '-'}</p>
+                                <p><b>Atas Nama:</b> ${s.an_bank || '-'}</p>
                             </div>
                         </div>
                     </div>
-
                 </div>
             `;
-            
+
             document.getElementById('m-content').innerHTML = html;
             document.getElementById('modal-detail').classList.remove('hidden');
         }
