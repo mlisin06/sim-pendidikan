@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIM SDN 03 Limbangan - Integrasi Full Dapodik</title>
+    <title>SIM SDN 03 Limbangan - Dashboard Analitik & Dapodik</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js untuk Visualisasi Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SheetJS (Pembaca & Pembuat Excel) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase SDK (v9 Compat) -->
@@ -25,10 +27,11 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">SDN 03 LIMBANGAN</h1>
-                    <p class="text-xs text-blue-200">Kec. Ulujami, Kab. Pemalang • SIM & Kelola Full Dapodik</p>
+                    <p class="text-xs text-blue-200">Kec. Ulujami, Kab. Pemalang • SIM & Dashboard Analitik</p>
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold">
+                <a href="#dashboard" class="hover:text-blue-200 py-1 px-2">Dashboard</a>
                 <a href="#siswa" class="hover:text-blue-200 py-1 px-2">Siswa</a>
                 <a href="#guru" class="hover:text-blue-200 py-1 px-2">Guru</a>
                 <a href="#sarpras" class="hover:text-blue-200 py-1 px-2">Sarpras</a>
@@ -39,32 +42,106 @@
 
     <main class="container mx-auto px-4 py-6 flex-grow space-y-8">
 
-        <!-- Banner Ringkasan Statistik -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-4">
-                <div class="p-3 bg-blue-100 text-blue-700 rounded-lg text-2xl"><i class="fa-solid fa-user-graduate"></i></div>
+        <!-- DASHBOARD ANALITIK & REKAPITULASI -->
+        <section id="dashboard" class="space-y-6">
+            
+            <!-- Panel Filter Periode / Tahun Pelajaran -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <span class="text-xs text-gray-500 block">Total Siswa Terdaftar</span>
-                    <span id="stat-siswa" class="text-2xl font-bold text-blue-900">0</span>
+                    <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Dashboard Rekapitulasi Sekolah</h2>
+                    <p class="text-xs text-gray-500">Pilih periode akademik untuk memfilter data rekapitulasi secara otomatis.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Tahun Pelajaran</label>
+                        <select id="filter-tp" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                            <option value="2025/2026" selected>2025/2026</option>
+                            <option value="2026/2027">2026/2027</option>
+                            <option value="2027/2028">2027/2028</option>
+                            <option value="2028/2029">2028/2029</option>
+                            <option value="2029/2030">2029/2030</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Semester</label>
+                        <select id="filter-smt" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                            <option value="Ganjil" selected>Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-4">
-                <div class="p-3 bg-green-100 text-green-700 rounded-lg text-2xl"><i class="fa-solid fa-chalkboard-user"></i></div>
-                <div>
-                    <span class="text-xs text-gray-500 block">Total Guru & Tendik</span>
-                    <span id="stat-guru" class="text-2xl font-bold text-green-900">0</span>
+
+            <!-- Kartu Ringkasan Utama -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
+                    <div class="p-3 bg-blue-100 text-blue-700 rounded-lg text-xl"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div>
+                        <span class="text-[11px] text-gray-500 block">Total Siswa</span>
+                        <span id="stat-siswa" class="text-xl font-extrabold text-blue-900">0</span>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
+                    <div class="p-3 bg-green-100 text-green-700 rounded-lg text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div>
+                        <span class="text-[11px] text-gray-500 block">Guru & Tendik</span>
+                        <span id="stat-guru" class="text-xl font-extrabold text-green-900">0</span>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
+                    <div class="p-3 bg-yellow-100 text-yellow-800 rounded-lg text-xl"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    <div>
+                        <span class="text-[11px] text-gray-500 block">Penerima PIP</span>
+                        <span id="stat-pip" class="text-xl font-extrabold text-yellow-700">0</span>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
+                    <div class="p-3 bg-purple-100 text-purple-700 rounded-lg text-xl"><i class="fa-solid fa-boxes-packing"></i></div>
+                    <div>
+                        <span class="text-[11px] text-gray-500 block">Total Sarpras</span>
+                        <span id="stat-sarpras" class="text-xl font-extrabold text-purple-900">0</span>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-4">
-                <div class="p-3 bg-purple-100 text-purple-700 rounded-lg text-2xl"><i class="fa-solid fa-boxes-packing"></i></div>
-                <div>
-                    <span class="text-xs text-gray-500 block">Total Sarpras</span>
-                    <span id="stat-sarpras" class="text-2xl font-bold text-purple-900">0</span>
+
+            <!-- Visualisasi Grafik Interaktif -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Grafik 1: Penerima PIP Per Kelas -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3 md:col-span-2">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-chart-bar text-yellow-600 mr-1.5"></i>Rekapitulasi Penerima PIP per Kelas</h4>
+                        <span class="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-semibold" id="lbl-pip-periode">2025/2026 - Ganjil</span>
+                    </div>
+                    <div class="h-60 relative">
+                        <canvas id="chartPIP"></canvas>
+                    </div>
                 </div>
+
+                <!-- Grafik 2: Jenis Kelamin Siswa -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-pie-chart text-blue-600 mr-1.5"></i>Rasio Jenis Kelamin</h4>
+                    </div>
+                    <div class="h-60 relative flex items-center justify-center">
+                        <canvas id="chartJK"></canvas>
+                    </div>
+                </div>
+
+                <!-- Grafik 3: Distribusi Usia Siswa -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3 md:col-span-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-cake-candles text-purple-600 mr-1.5"></i>Kelompok Usia Siswa (Tahun)</h4>
+                    </div>
+                    <div class="h-56 relative">
+                        <canvas id="chartUsia"></canvas>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <!-- Panel Admin & Import/Download Template Excel -->
+        <!-- PANEL ADMIN & IMPORT/DOWNLOAD TEMPLATE -->
         <section id="admin" class="bg-white p-6 rounded-xl shadow-sm border border-blue-200 space-y-6">
             <div class="border-b pb-3 flex justify-between items-center">
                 <div>
@@ -106,7 +183,7 @@
                 </div>
             </div>
 
-            <!-- Tab Form Input Manual / Edit -->
+            <!-- Tab Form Input Manual -->
             <div class="border-t pt-4">
                 <div class="flex space-x-2 border-b mb-4">
                     <button onclick="switchTab('siswa')" id="tab-btn-siswa" class="px-3 py-1.5 font-bold text-xs text-blue-700 border-b-2 border-blue-700">Form Siswa (Full 54 Atribut Dapodik)</button>
@@ -443,28 +520,174 @@
         let allGuru = {};
         let allSarpras = {};
 
+        // Variabel Chart.js
+        let chartPIPInstance = null;
+        let chartJKInstance = null;
+        let chartUsiaInstance = null;
+
+        // Inisialisasi Grafik
+        function initCharts() {
+            // Chart PIP Per Kelas
+            const ctxPIP = document.getElementById('chartPIP').getContext('2d');
+            chartPIPInstance = new Chart(ctxPIP, {
+                type: 'bar',
+                data: {
+                    labels: ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'],
+                    datasets: [{
+                        label: 'Siswa Penerima PIP',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(234, 179, 8, 0.85)',
+                        borderColor: 'rgba(202, 138, 4, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+
+            // Chart Jenis Kelamin
+            const ctxJK = document.getElementById('chartJK').getContext('2d');
+            chartJKInstance = new Chart(ctxJK, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-laki', 'Perempuan'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(236, 72, 153, 0.85)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Chart Kelompok Usia
+            const ctxUsia = document.getElementById('chartUsia').getContext('2d');
+            chartUsiaInstance = new Chart(ctxUsia, {
+                type: 'bar',
+                data: {
+                    labels: ['< 6 Thn', '6 - 7 Thn', '8 - 9 Thn', '10 - 11 Thn', '12+ Thn'],
+                    datasets: [{
+                        label: 'Jumlah Siswa',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(147, 51, 234, 0.8)',
+                        borderColor: 'rgba(126, 34, 206, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+
         // Realtime Listener: Siswa
         db.ref('siswa').on('value', snapshot => {
             allSiswa = snapshot.val() || {};
             renderSiswa();
-            document.getElementById('stat-siswa').innerText = Object.keys(allSiswa).length;
+            updateDashboard();
         });
 
         // Realtime Listener: Guru
         db.ref('guru').on('value', snapshot => {
             allGuru = snapshot.val() || {};
             renderGuru();
-            document.getElementById('stat-guru').innerText = Object.keys(allGuru).length;
+            updateDashboard();
         });
 
         // Realtime Listener: Sarpras
         db.ref('sarpras').on('value', snapshot => {
             allSarpras = snapshot.val() || {};
             renderSarpras();
-            document.getElementById('stat-sarpras').innerText = Object.keys(allSarpras).length;
+            updateDashboard();
         });
 
-        // Fungsi Download Template Excel Kosong
+        // Perbarui Data Dashboard & Grafik
+        function updateDashboard() {
+            const tp = document.getElementById('filter-tp').value;
+            const smt = document.getElementById('filter-smt').value;
+            document.getElementById('lbl-pip-periode').innerText = `${tp} - ${smt}`;
+
+            const siswaKeys = Object.keys(allSiswa);
+            const guruKeys = Object.keys(allGuru);
+            const sarprasKeys = Object.keys(allSarpras);
+
+            document.getElementById('stat-siswa').innerText = siswaKeys.length;
+            document.getElementById('stat-guru').innerText = guruKeys.length;
+            document.getElementById('stat-sarpras').innerText = sarprasKeys.length;
+
+            // Hitung Penerima PIP
+            let countPIP = 0;
+            const pipPerKelas = [0, 0, 0, 0, 0, 0];
+            let countL = 0, countP = 0;
+            const usiaCounts = [0, 0, 0, 0, 0]; // [<6, 6-7, 8-9, 10-11, 12+]
+
+            const nowYear = new Date().getFullYear();
+
+            siswaKeys.forEach(k => {
+                const s = allSiswa[k];
+
+                // Hitung JK
+                const jk = (s.jk || '').toUpperCase();
+                if(jk === 'L' || jk === 'LAKI-LAKI') countL++;
+                else if(jk === 'P' || jk === 'PEREMPUAN') countP++;
+
+                // Hitung PIP
+                const isPIP = (s.penerima_kip || s.layak_pip || '').toString().toLowerCase();
+                if(isPIP.includes('ya') || isPIP.includes('1') || isPIP.includes('layak') || isPIP.includes('penerima')) {
+                    countPIP++;
+
+                    const rombelStr = (s.rombel || s.kelas || '').toString();
+                    for(let i=1; i<=6; i++) {
+                        if(rombelStr.includes(i.toString())) {
+                            pipPerKelas[i-1]++;
+                            break;
+                        }
+                    }
+                }
+
+                // Hitung Usia
+                if(s.tgl_lahir) {
+                    const birthYear = new Date(s.tgl_lahir).getFullYear();
+                    if(!isNaN(birthYear)) {
+                        const age = nowYear - birthYear;
+                        if(age < 6) usiaCounts[0]++;
+                        else if(age <= 7) usiaCounts[1]++;
+                        else if(age <= 9) usiaCounts[2]++;
+                        else if(age <= 11) usiaCounts[3]++;
+                        else usiaCounts[4]++;
+                    }
+                }
+            });
+
+            document.getElementById('stat-pip').innerText = countPIP;
+
+            // Update Charts
+            if(chartPIPInstance) {
+                chartPIPInstance.data.datasets[0].data = pipPerKelas;
+                chartPIPInstance.update();
+            }
+
+            if(chartJKInstance) {
+                chartJKInstance.data.datasets[0].data = [countL, countP];
+                chartJKInstance.update();
+            }
+
+            if(chartUsiaInstance) {
+                chartUsiaInstance.data.datasets[0].data = usiaCounts;
+                chartUsiaInstance.update();
+            }
+        }
+
+        // Download Template Excel Kosong
         function downloadTemplateExcel() {
             const headers = [
                 "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
@@ -1079,6 +1302,11 @@
         function closeModal() {
             document.getElementById('modal-detail').classList.add('hidden');
         }
+
+        // On Load Init
+        window.onload = function() {
+            initCharts();
+        };
     </script>
 </body>
 </html>
