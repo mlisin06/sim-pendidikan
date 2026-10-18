@@ -828,6 +828,25 @@
                             <p><b>Berat Badan:</b> <span class="font-bold text-purple-900">${s.bb || '-'} kg</span></p>
                             <p><b>Lingkar Kepala:</b> <span class="font-bold text-purple-900">${s.lingkar_kepala || '-'} cm</span></p>
                             <p><b>Anak Ke- / Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
+                            <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200">
+                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase">3. Alamat & Kontak</h5>
+                        <div class="space-y-1">
+                            <p><b>Alamat:</b> ${s.alamat || '-'} (RT ${s.rt || '-'}/RW ${s.rw || '-'})</p>
+                            <p><b>Desa/Kelurahan:</b> ${s.kelurahan || '-'}</p>
+                            <p><b>Kecamatan:</b> ${s.kecamatan || '-'}</p>
+                            <p><b>No HP / Email:</b> ${s.hp || '-'} / ${s.email || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
+                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase">4. Orang Tua & Bantuan</h5>
+                        <div class="space-y-1">
+                            <p><b>Ayah:</b> ${s.nama_ayah || '-'} (${s.kerja_ayah || '-'})</p>
+                            <p><b>Ibu:</b> ${s.nama_ibu || s.ibu || '-'} (${s.kerja_ibu || '-'})</p>
+                            <p><b>Layak PIP / KIP:</b> ${s.layak_pip || '-'} / ${s.penerima_kip || '-'}</p>
+                            <p><b>Bank / Rekening:</b> ${s.bank || '-'} - ${s.norek || '-'} (${s.an_bank || '-'})</p>
                         </div>
                     </div>
                 </div>
