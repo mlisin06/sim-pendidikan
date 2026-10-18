@@ -43,7 +43,7 @@
         <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik</h2>
-                <p class="text-xs text-gray-500">Pilih Tahun Pelajaran dan Semester untuk melihat rekapitulasi data real-time.</p>
+                <p class="text-xs text-gray-500">Pilih Tahun Pelajaran, Semester, dan Kelas untuk memfilter data rekap dan daftar siswa.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
@@ -61,6 +61,18 @@
                     <select id="filter-smt" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
                         <option value="Ganjil" selected>Ganjil</option>
                         <option value="Genap">Genap</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Filter Kelas</label>
+                    <select id="filter-kelas-tabel" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                        <option value="">Semua Kelas (1-6)</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                        <option value="Kelas 6">Kelas 6</option>
                     </select>
                 </div>
             </div>
@@ -115,9 +127,7 @@
                             <th class="py-2 px-3 border bg-yellow-700">Penerima PIP</th>
                         </tr>
                     </thead>
-                    <tbody id="tbl-rekap-kelas-body" class="divide-y font-medium text-gray-700">
-                        <!-- Iterasi Kelas 1 - 6 via JS -->
-                    </tbody>
+                    <tbody id="tbl-rekap-kelas-body" class="divide-y font-medium text-gray-700"></tbody>
                     <tfoot class="bg-gray-100 font-extrabold text-gray-900 text-xs border-t-2">
                         <tr>
                             <td class="py-2.5 px-3 border text-left">TOTAL KESELURUHAN</td>
@@ -131,42 +141,68 @@
             </div>
         </div>
 
+        <!-- DAFTAR SISWA SESUAI FILTER (LIHAT DETAIL SAJA) -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
+                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
+                <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="py-2.5 px-3 border">NISN</th>
+                            <th class="py-2.5 px-3 border">Nama Lengkap</th>
+                            <th class="py-2.5 px-3 border">JK</th>
+                            <th class="py-2.5 px-3 border">Kelas</th>
+                            <th class="py-2.5 px-3 border">Fisik (TB / BB / LK)</th>
+                            <th class="py-2.5 px-3 border">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-daftar-siswa-rekap" class="divide-y text-xs">
+                        <tr><td colspan="6" class="text-center py-6 text-gray-400">Memuat data siswa...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- VISUALISASI GRAFIK INTERAKTIF -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Grafik 1: PIP Per Kelas -->
             <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3 md:col-span-2">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-chart-bar text-yellow-600 mr-1.5"></i>Grafik Penerima PIP per Kelas</h4>
                 </div>
-                <div class="h-60 relative">
-                    <canvas id="chartPIP"></canvas>
-                </div>
+                <div class="h-60 relative"><canvas id="chartPIP"></canvas></div>
             </div>
-
-            <!-- Grafik 2: Jenis Kelamin Siswa -->
             <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-pie-chart text-blue-600 mr-1.5"></i>Rasio Jenis Kelamin</h4>
                 </div>
-                <div class="h-60 relative flex items-center justify-center">
-                    <canvas id="chartJK"></canvas>
-                </div>
+                <div class="h-60 relative flex items-center justify-center"><canvas id="chartJK"></canvas></div>
             </div>
-
-            <!-- Grafik 3: Kelompok Usia -->
             <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3 md:col-span-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-cake-candles text-purple-600 mr-1.5"></i>Distribusi Kelompok Usia Siswa</h4>
                 </div>
-                <div class="h-56 relative">
-                    <canvas id="chartUsia"></canvas>
-                </div>
+                <div class="h-56 relative"><canvas id="chartUsia"></canvas></div>
             </div>
-
         </div>
 
     </main>
+
+    <!-- Modal Detail Siswa -->
+    <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm" id="m-title">Detail Lengkap Siswa</h4>
+                <button onclick="closeModal()" class="text-white hover:text-red-300 font-bold text-lg">&times;</button>
+            </div>
+            <div id="m-content" class="p-6 overflow-y-auto text-xs space-y-3"></div>
+            <div class="bg-gray-100 p-3 text-right">
+                <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-1.5 rounded text-xs">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-4 text-center text-xs">
@@ -190,9 +226,6 @@
         const db = firebase.database();
 
         let allSiswa = {};
-        let allGuru = {};
-        let allSarpras = {};
-
         let chartPIPInstance = null;
         let chartJKInstance = null;
         let chartUsiaInstance = null;
@@ -203,14 +236,7 @@
                 type: 'bar',
                 data: {
                     labels: ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'],
-                    datasets: [{
-                        label: 'Siswa Penerima PIP',
-                        data: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: 'rgba(234, 179, 8, 0.85)',
-                        borderColor: 'rgba(202, 138, 4, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
+                    datasets: [{ label: 'Siswa Penerima PIP', data: [0,0,0,0,0,0], backgroundColor: 'rgba(234, 179, 8, 0.85)', borderWidth: 1, borderRadius: 4 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
@@ -218,13 +244,7 @@
             const ctxJK = document.getElementById('chartJK').getContext('2d');
             chartJKInstance = new Chart(ctxJK, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Laki-laki', 'Perempuan'],
-                    datasets: [{
-                        data: [0, 0],
-                        backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(236, 72, 153, 0.85)']
-                    }]
-                },
+                data: { labels: ['Laki-laki', 'Perempuan'], datasets: [{ data: [0,0], backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(236, 72, 153, 0.85)'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
@@ -233,14 +253,7 @@
                 type: 'bar',
                 data: {
                     labels: ['< 6 Thn', '6 - 7 Thn', '8 - 9 Thn', '10 - 11 Thn', '12+ Thn'],
-                    datasets: [{
-                        label: 'Jumlah Siswa',
-                        data: [0, 0, 0, 0, 0],
-                        backgroundColor: 'rgba(147, 51, 234, 0.8)',
-                        borderColor: 'rgba(126, 34, 206, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
+                    datasets: [{ label: 'Jumlah Siswa', data: [0,0,0,0,0], backgroundColor: 'rgba(147, 51, 234, 0.8)', borderWidth: 1, borderRadius: 4 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
@@ -252,31 +265,30 @@
         });
 
         db.ref('guru').on('value', snapshot => {
-            allGuru = snapshot.val() || {};
-            document.getElementById('stat-guru').innerText = Object.keys(allGuru).length;
+            document.getElementById('stat-guru').innerText = Object.keys(snapshot.val() || {}).length;
         });
 
         db.ref('sarpras').on('value', snapshot => {
-            allSarpras = snapshot.val() || {};
-            document.getElementById('stat-sarpras').innerText = Object.keys(allSarpras).length;
+            document.getElementById('stat-sarpras').innerText = Object.keys(snapshot.val() || {}).length;
         });
 
         function updateDashboard() {
             const selectedTP = document.getElementById('filter-tp').value;
             const selectedSMT = document.getElementById('filter-smt').value;
+            const selectedKelas = document.getElementById('filter-kelas-tabel').value;
+            const searchQuery = document.getElementById('search-siswa-rekap').value.toLowerCase();
+
             document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP} - ${selectedSMT}`;
 
             const siswaKeys = Object.keys(allSiswa);
-
-            let totalSiswaPeriode = 0;
-            let countPIP = 0;
-            let countL = 0, countP = 0;
+            let totalSiswaPeriode = 0, countPIP = 0, countL = 0, countP = 0;
             const usiaCounts = [0, 0, 0, 0, 0];
-
-            // Rekap Per Kelas: [ [L, P, Total, PIP], ... ] untuk Kelas 1 s.d 6
             const rekapKelas = Array.from({ length: 6 }, () => [0, 0, 0, 0]);
-
             const nowYear = new Date().getFullYear();
+
+            const tbodySiswa = document.getElementById('tbl-daftar-siswa-rekap');
+            tbodySiswa.innerHTML = '';
+            let filteredSiswaCount = 0;
 
             siswaKeys.forEach(k => {
                 const s = allSiswa[k];
@@ -285,79 +297,83 @@
 
                 if (sTP === selectedTP && sSMT === selectedSMT) {
                     totalSiswaPeriode++;
-
                     const jk = (s.jk || '').toUpperCase();
                     const isL = (jk === 'L' || jk === 'LAKI-LAKI');
                     const isP = (jk === 'P' || jk === 'PEREMPUAN');
 
-                    if(isL) countL++;
-                    else if(isP) countP++;
+                    if(isL) countL++; else if(isP) countP++;
 
-                    // Tentukan Rombel Kelas 1 - 6
                     const rombelStr = (s.rombel || s.kelas || '').toString();
                     let classIndex = -1;
                     for(let i=1; i<=6; i++) {
-                        if(rombelStr.includes(i.toString())) {
-                            classIndex = i - 1;
-                            break;
-                        }
+                        if(rombelStr.includes(i.toString())) { classIndex = i - 1; break; }
                     }
 
                     if(classIndex !== -1) {
                         if(isL) rekapKelas[classIndex][0]++;
                         if(isP) rekapKelas[classIndex][1]++;
-                        rekapKelas[classIndex][2]++; // Total
+                        rekapKelas[classIndex][2]++;
                     }
 
-                    // PIP
                     const isPIP = (s.penerima_kip || s.layak_pip || '').toString().toLowerCase();
                     if(isPIP.includes('ya') || isPIP.includes('1') || isPIP.includes('layak') || isPIP.includes('penerima')) {
                         countPIP++;
                         if(classIndex !== -1) rekapKelas[classIndex][3]++;
                     }
 
-                    // Usia
                     if(s.tgl_lahir) {
                         const birthYear = new Date(s.tgl_lahir).getFullYear();
                         if(!isNaN(birthYear)) {
                             const age = nowYear - birthYear;
-                            if(age < 6) usiaCounts[0]++;
-                            else if(age <= 7) usiaCounts[1]++;
-                            else if(age <= 9) usiaCounts[2]++;
-                            else if(age <= 11) usiaCounts[3]++;
-                            else usiaCounts[4]++;
+                            if(age < 6) usiaCounts[0]++; else if(age <= 7) usiaCounts[1]++; else if(age <= 9) usiaCounts[2]++; else if(age <= 11) usiaCounts[3]++; else usiaCounts[4]++;
                         }
+                    }
+
+                    // Filter Tabel Siswa Bawah
+                    const matchKelas = selectedKelas === "" || rombelStr.includes(selectedKelas);
+                    const matchSearch = (s.nama || '').toLowerCase().includes(searchQuery) || (s.nisn || '').toString().includes(searchQuery);
+
+                    if(matchKelas && matchSearch) {
+                        filteredSiswaCount++;
+                        tbodySiswa.innerHTML += `
+                            <tr class="hover:bg-blue-50/40">
+                                <td class="py-2 px-3 border font-mono">${s.nisn || '-'}</td>
+                                <td class="py-2 px-3 border font-bold text-gray-900">${s.nama || '-'}</td>
+                                <td class="py-2 px-3 border">${s.jk || '-'}</td>
+                                <td class="py-2 px-3 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
+                                <td class="py-2 px-3 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
+                                <td class="py-2 px-3 border">
+                                    <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[10px]">Detail</button>
+                                </td>
+                            </tr>
+                        `;
                     }
                 }
             });
+
+            if(filteredSiswaCount === 0) {
+                tbodySiswa.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
+            }
 
             document.getElementById('stat-siswa').innerText = totalSiswaPeriode;
             document.getElementById('stat-pip').innerText = countPIP;
 
             // Render Tabel Rekap Kelas
-            const tbody = document.getElementById('tbl-rekap-kelas-body');
-            tbody.innerHTML = '';
-
-            let sumL = 0, sumP = 0, sumAll = 0, sumPIP = 0;
+            const tbodyKelas = document.getElementById('tbl-rekap-kelas-body');
+            tbodyKelas.innerHTML = '';
+            let sumL=0, sumP=0, sumAll=0, sumPIP=0;
 
             for(let i=0; i<6; i++) {
-                const rowL = rekapKelas[i][0];
-                const rowP = rekapKelas[i][1];
-                const rowTot = rekapKelas[i][2];
-                const rowPIP = rekapKelas[i][3];
+                const rL = rekapKelas[i][0], rP = rekapKelas[i][1], rTot = rekapKelas[i][2], rPIP = rekapKelas[i][3];
+                sumL += rL; sumP += rP; sumAll += rTot; sumPIP += rPIP;
 
-                sumL += rowL;
-                sumP += rowP;
-                sumAll += rowTot;
-                sumPIP += rowPIP;
-
-                tbody.innerHTML += `
+                tbodyKelas.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="py-2 px-3 border text-left font-bold text-blue-900">Kelas ${i+1}</td>
-                        <td class="py-2 px-3 border text-blue-800">${rowL} Siswa</td>
-                        <td class="py-2 px-3 border text-pink-700">${rowP} Siswa</td>
-                        <td class="py-2 px-3 border font-bold text-black bg-gray-50">${rowTot} Siswa</td>
-                        <td class="py-2 px-3 border font-bold text-yellow-700">${rowPIP} Siswa</td>
+                        <td class="py-2 px-3 border text-blue-800">${rL} Siswa</td>
+                        <td class="py-2 px-3 border text-pink-700">${rP} Siswa</td>
+                        <td class="py-2 px-3 border font-bold text-black bg-gray-50">${rTot} Siswa</td>
+                        <td class="py-2 px-3 border font-bold text-yellow-700">${rPIP} Siswa</td>
                     </tr>
                 `;
             }
@@ -367,26 +383,48 @@
             document.getElementById('tot-all').innerText = `${sumAll} Siswa`;
             document.getElementById('tot-pip').innerText = `${sumPIP} Siswa`;
 
-            // Update Charts
-            if(chartPIPInstance) {
-                chartPIPInstance.data.datasets[0].data = rekapKelas.map(r => r[3]);
-                chartPIPInstance.update();
-            }
-
-            if(chartJKInstance) {
-                chartJKInstance.data.datasets[0].data = [countL, countP];
-                chartJKInstance.update();
-            }
-
-            if(chartUsiaInstance) {
-                chartUsiaInstance.data.datasets[0].data = usiaCounts;
-                chartUsiaInstance.update();
-            }
+            if(chartPIPInstance) { chartPIPInstance.data.datasets[0].data = rekapKelas.map(r => r[3]); chartPIPInstance.update(); }
+            if(chartJKInstance) { chartJKInstance.data.datasets[0].data = [countL, countP]; chartJKInstance.update(); }
+            if(chartUsiaInstance) { chartUsiaInstance.data.datasets[0].data = usiaCounts; chartUsiaInstance.update(); }
         }
 
-        window.onload = function() {
-            initCharts();
-        };
+        document.getElementById('search-siswa-rekap').addEventListener('input', updateDashboard);
+
+        function showDetail(key) {
+            const s = allSiswa[key];
+            if(!s) return;
+            document.getElementById('m-title').innerText = `Detail Data: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
+            document.getElementById('m-content').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-blue-50 p-3 rounded border">
+                        <h5 class="font-bold text-blue-900 border-b pb-1 mb-1">Informasi Akademik</h5>
+                        <p><b>Periode:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
+                        <p><b>Nama:</b> ${s.nama}</p>
+                        <p><b>NISN / NIPD:</b> ${s.nisn} / ${s.nipd || '-'}</p>
+                        <p><b>Rombel:</b> ${s.rombel || s.kelas || '-'}</p>
+                        <p><b>JK / Agama:</b> ${s.jk} / ${s.agama || '-'}</p>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded border">
+                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-1">Perkembangan Fisik</h5>
+                        <p><b>Tinggi Badan:</b> ${s.tb || '-'} cm</p>
+                        <p><b>Berat Badan:</b> ${s.bb || '-'} kg</p>
+                        <p><b>Lingkar Kepala:</b> ${s.lingkar_kepala || '-'} cm</p>
+                        <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded border md:col-span-2">
+                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-1">Kontak & Orang Tua</h5>
+                        <p><b>Alamat:</b> ${s.alamat || '-'} RT ${s.rt||'-'}/RW ${s.rw||'-'}, ${s.kelurahan||'-'}</p>
+                        <p><b>Ayah:</b> ${s.nama_ayah || '-'} | <b>Ibu:</b> ${s.nama_ibu || '-'}</p>
+                        <p><b>Penerima PIP / KIP:</b> ${s.penerima_kip || s.layak_pip || '-'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('modal-detail').classList.add('hidden'); }
+
+        window.onload = function() { initCharts(); };
     </script>
 </body>
 </html>
