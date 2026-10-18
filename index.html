@@ -39,19 +39,17 @@
 
     <main class="container mx-auto px-4 py-6 flex-grow space-y-8">
 
-        <!-- PANEL FILTER PERIODE GLOBAL -->
+        <!-- PANEL FILTER PERIODE DINAMIS -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik</h2>
-                <p class="text-xs text-gray-500">Pilih Tahun Pelajaran, Semester, dan Kelas untuk memfilter data rekap dan daftar siswa.</p>
+                <p class="text-xs text-gray-500">Pilihan Tahun Pelajaran otomatis menyesuaikan data yang masuk ke database.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Tahun Pelajaran</label>
                     <select id="filter-tp" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
-                        <option value="2025/2026" selected>2025/2026</option>
-                        <option value="2026/2027">2026/2027</option>
-                        <option value="2027/2028">2027/2028</option>
+                        <!-- Opsi akan terisi otomatis secara dinamis dari database -->
                     </select>
                 </div>
                 <div>
@@ -112,7 +110,7 @@
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-list-check text-blue-700 mr-2"></i>Rekapitulasi Siswa Berdasarkan Rombel / Kelas</h3>
-                <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded" id="lbl-rekap-kelas-periode">2025/2026 - Ganjil</span>
+                <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded" id="lbl-rekap-kelas-periode">-</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-center text-xs border border-gray-200">
@@ -268,6 +266,7 @@
 
         db.ref('siswa').on('value', snapshot => {
             allSiswa = snapshot.val() || {};
+            updateTahunPelajaranDropdown();
             updateDashboard();
         });
 
@@ -279,6 +278,43 @@
             allMutasi = snapshot.val() || {};
             renderPubMutasi();
         });
+
+        // Fungsi Dinamis Mengambil Tahun Pelajaran dari Data Siswa yang Masuk
+        function updateTahunPelajaranDropdown() {
+            const selectTP = document.getElementById('filter-tp');
+            const currentSelected = selectTP.value; // Simpan pilihan aktif saat ini
+            
+            let tpSet = new Set();
+            Object.values(allSiswa).forEach(s => {
+                if(s.tahun_pelajaran) {
+                    tpSet.add(s.tahun_pelajaran.trim());
+                }
+            });
+
+            // Jika belum ada data sama sekali di database, sediakan default
+            if(tpSet.size === 0) {
+                tpSet.add("2025/2026");
+            }
+
+            // Urutkan tahun secara menurun/terbaru
+            const sortedTP = Array.from(tpSet).sort().reverse();
+
+            selectTP.innerHTML = '';
+            sortedTP.forEach(tp => {
+                const opt = document.createElement('option');
+                opt.value = tp;
+                opt.innerText = tp;
+                if(tp === currentSelected) {
+                    opt.selected = true;
+                }
+                selectTP.appendChild(opt);
+            });
+
+            // Jika pilihan sebelumnya tidak ada di list baru, pilih yang pertama
+            if(!tpSet.has(currentSelected) && sortedTP.length > 0) {
+                selectTP.value = sortedTP[0];
+            }
+        }
 
         function renderPubMutasi() {
             const tbody = document.getElementById('tbl-pub-mutasi');
@@ -313,7 +349,7 @@
             const selectedKelas = document.getElementById('filter-kelas-tabel').value;
             const searchQuery = document.getElementById('search-siswa-rekap').value.toLowerCase();
 
-            document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP} - ${selectedSMT}`;
+            document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP || '-'} - ${selectedSMT}`;
 
             const siswaKeys = Object.keys(allSiswa);
             let totalSiswaPeriode = 0, countPIP = 0, countL = 0, countP = 0;
