@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS -->
+    <!-- SheetJS (Pembaca & Pembuat Excel) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase SDK (v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -38,12 +38,12 @@
 
     <main class="container mx-auto px-4 py-6 flex-grow space-y-8">
 
-        <!-- PANEL IMPORT EXCEL & DOWNLOAD TEMPLATE -->
+        <!-- PANEL IMPORT EXCEL & DOWNLOAD TEMPLATE LENGKAP -->
         <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <div class="border-b pb-3 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div>
-                    <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal (Excel Dapodik Lengkap)</h3>
-                    <p class="text-xs text-gray-500">Download template resmi dengan 68+ kolom atribut lengkap (termasuk TP, Semester, TB/BB/LK).</p>
+                    <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal (Excel Dapodik Full 68 Kolom)</h3>
+                    <p class="text-xs text-gray-500">Download template resmi dengan seluruh atribut Dapodik lengkap agar tidak ada data terpotong.</p>
                 </div>
                 <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-md text-xs whitespace-nowrap">
                     <i class="fa-solid fa-download mr-1"></i> Download Template Excel
@@ -64,70 +64,22 @@
             </div>
         </section>
 
-        <!-- FORM INPUT MANUAL & EDIT -->
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
-            <h3 class="text-sm font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-pen-to-square text-blue-700 mr-2"></i>Form Input / Edit Data Siswa</h3>
-            <form id="form-siswa" onsubmit="handleSaveSiswa(event)" class="space-y-4 text-xs">
-                <div class="bg-blue-50 p-3 rounded-lg border flex flex-wrap items-center gap-4">
-                    <span class="font-bold text-blue-900">Periode:</span>
-                    <div>
-                        <label class="font-semibold">Tahun Pelajaran:</label>
-                        <select id="f-tp-siswa" class="p-1 border rounded font-semibold ml-1">
-                            <option value="2025/2026" selected>2025/2026</option>
-                            <option value="2026/2027">2026/2027</option>
-                            <option value="2027/2028">2027/2028</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="font-semibold">Semester:</label>
-                        <select id="f-smt-siswa" class="p-1 border rounded font-semibold ml-1">
-                            <option value="Ganjil" selected>Ganjil</option>
-                            <option value="Genap">Genap</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-lg border">
-                    <div><label class="block font-semibold mb-1">NISN *</label><input type="text" id="f-nisn" required class="w-full p-2 border rounded"></div>
-                    <div><label class="block font-semibold mb-1">NIPD</label><input type="text" id="f-nipd" class="w-full p-2 border rounded"></div>
-                    <div class="md:col-span-2"><label class="block font-semibold mb-1">Nama Lengkap *</label><input type="text" id="f-nama" required class="w-full p-2 border rounded"></div>
-                    <div>
-                        <label class="block font-semibold mb-1">JK</label>
-                        <select id="f-jk" class="w-full p-2 border rounded"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1">Rombel / Kelas *</label>
-                        <select id="f-rombel" required class="w-full p-2 border rounded">
-                            <option value="Kelas 1">Kelas 1</option><option value="Kelas 2">Kelas 2</option><option value="Kelas 3">Kelas 3</option>
-                            <option value="Kelas 4">Kelas 4</option><option value="Kelas 5">Kelas 5</option><option value="Kelas 6">Kelas 6</option>
-                        </select>
-                    </div>
-                    <div><label class="block font-semibold mb-1">Tanggal Lahir</label><input type="date" id="f-tgl-lahir" class="w-full p-2 border rounded"></div>
-                    <div><label class="block font-semibold mb-1">Tinggi Badan (cm)</label><input type="number" id="f-tb" class="w-full p-2 border rounded"></div>
-                    <div><label class="block font-semibold mb-1">Berat Badan (kg)</label><input type="number" id="f-bb" class="w-full p-2 border rounded"></div>
-                    <div><label class="block font-semibold mb-1">Lingkar Kepala (cm)</label><input type="number" id="f-lingkar-kepala" class="w-full p-2 border rounded"></div>
-                    <div><label class="block font-semibold mb-1">Layak PIP / KIP</label><input type="text" id="f-layak-pip" placeholder="Ya / Tidak" class="w-full p-2 border rounded"></div>
-                </div>
-
-                <div class="flex space-x-2">
-                    <button type="submit" id="btn-save" class="bg-blue-700 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Data Siswa</button>
-                    <button type="button" onclick="resetForm()" class="bg-gray-400 text-white font-semibold px-4 py-2 rounded text-xs">Reset</button>
-                </div>
-            </form>
-        </section>
-
         <!-- DIREKTORI TABEL ADMIN (LENGKAP DENGAN EDIT & HAPUS) -->
         <section class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
-            <h3 class="text-base font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa (Admin)</h3>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b pb-2">
+                <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa (Admin)</h3>
+                <input type="text" id="search-admin" placeholder="Cari NISN / Nama / NIK..." class="px-3 py-1.5 border rounded text-xs w-full sm:w-64">
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
-                            <th class="p-2 border">NISN</th>
-                            <th class="p-2 border">Nama</th>
+                            <th class="p-2 border">NISN / NIPD</th>
+                            <th class="p-2 border">Nama Lengkap</th>
                             <th class="p-2 border">JK</th>
                             <th class="p-2 border">Kelas</th>
                             <th class="p-2 border">Periode</th>
+                            <th class="p-2 border">Orang Tua (A / I)</th>
                             <th class="p-2 border">Fisik (TB/BB/LK)</th>
                             <th class="p-2 border">Aksi Admin</th>
                         </tr>
@@ -138,6 +90,20 @@
         </section>
 
     </main>
+
+    <!-- Modal Detail Admin -->
+    <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm" id="m-title">Detail Lengkap Siswa</h4>
+                <button onclick="closeModal()" class="text-white hover:text-red-300 font-bold text-lg">&times;</button>
+            </div>
+            <div id="m-content" class="p-6 overflow-y-auto text-xs space-y-4"></div>
+            <div class="bg-gray-100 p-3 text-right">
+                <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-1.5 rounded text-xs">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -161,86 +127,47 @@
 
         function renderTableAdmin() {
             const tbody = document.getElementById('tbl-admin-siswa');
+            const search = document.getElementById('search-admin').value.toLowerCase();
             tbody.innerHTML = '';
             const keys = Object.keys(allSiswa);
 
-            if(keys.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400">Belum ada data siswa.</td></tr>';
+            const filtered = keys.filter(k => {
+                const s = allSiswa[k];
+                return (s.nama || '').toLowerCase().includes(search) || (s.nisn || '').toString().includes(search) || (s.nik || '').toString().includes(search);
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Belum ada data siswa.</td></tr>';
                 return;
             }
 
-            keys.forEach(k => {
+            filtered.forEach(k => {
                 const s = allSiswa[k];
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
-                        <td class="p-2 border font-mono">${s.nisn || '-'}</td>
+                        <td class="p-2 border font-mono">${s.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIPD: ${s.nipd || '-'}</span></td>
                         <td class="p-2 border font-bold text-gray-900">${s.nama}</td>
                         <td class="p-2 border">${s.jk || '-'}</td>
                         <td class="p-2 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
-                        <td class="p-2 border">${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</td>
+                        <td class="p-2 border font-mono text-[11px]">${s.tahun_pelajaran || '2025/2026'}<br><span class="text-gray-400 text-[10px]">${s.semester || 'Ganjil'}</span></td>
+                        <td class="p-2 border">A: ${s.nama_ayah || '-'}<br>I: ${s.nama_ibu || s.ibu || '-'}</td>
                         <td class="p-2 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
                         <td class="p-2 border space-x-1">
-                            <button onclick="editSiswa('${k}')" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold px-2.5 py-1 rounded text-[10px]">Edit</button>
-                            <button onclick="deleteSiswa('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-[10px]">Hapus</button>
+                            <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]">Detail</button>
+                            <button onclick="deleteSiswa('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        function handleSaveSiswa(e) {
-            e.preventDefault();
-            const nisn = document.getElementById('f-nisn').value;
-            const data = {
-                tahun_pelajaran: document.getElementById('f-tp-siswa').value,
-                semester: document.getElementById('f-smt-siswa').value,
-                nisn: nisn,
-                nipd: document.getElementById('f-nipd').value,
-                nama: document.getElementById('f-nama').value,
-                jk: document.getElementById('f-jk').value,
-                rombel: document.getElementById('f-rombel').value,
-                tgl_lahir: document.getElementById('f-tgl-lahir').value,
-                tb: document.getElementById('f-tb').value,
-                bb: document.getElementById('f-bb').value,
-                lingkar_kepala: document.getElementById('f-lingkar-kepala').value,
-                layak_pip: document.getElementById('f-layak-pip').value
-            };
-            db.ref('siswa/' + nisn).set(data, err => {
-                if(!err) { alert('Data siswa berhasil disimpan!'); resetForm(); }
-                else alert('Gagal: ' + err.message);
-            });
-        }
-
-        function editSiswa(key) {
-            const s = allSiswa[key];
-            if(!s) return;
-            document.getElementById('f-tp-siswa').value = s.tahun_pelajaran || '2025/2026';
-            document.getElementById('f-smt-siswa').value = s.semester || 'Ganjil';
-            document.getElementById('f-nisn').value = s.nisn || '';
-            document.getElementById('f-nisn').readOnly = true;
-            document.getElementById('f-nipd').value = s.nipd || '';
-            document.getElementById('f-nama').value = s.nama || '';
-            document.getElementById('f-jk').value = s.jk || 'L';
-            document.getElementById('f-rombel').value = s.rombel || s.kelas || 'Kelas 1';
-            document.getElementById('f-tgl-lahir').value = s.tgl_lahir || '';
-            document.getElementById('f-tb').value = s.tb || '';
-            document.getElementById('f-bb').value = s.bb || '';
-            document.getElementById('f-lingkar-kepala').value = s.lingkar_kepala || '';
-            document.getElementById('f-layak-pip').value = s.layak_pip || '';
-            document.getElementById('btn-save').innerText = "Update Data Siswa";
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-        function resetForm() {
-            document.getElementById('form-siswa').reset();
-            document.getElementById('f-nisn').readOnly = false;
-            document.getElementById('btn-save').innerText = "Simpan Data Siswa";
-        }
+        document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
 
         function deleteSiswa(key) {
             if(confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) db.ref('siswa/' + key).remove();
         }
 
+        // Download Template Excel Full 68 Kolom Dapodik
         function downloadTemplateExcel() {
             const headers = [
                 "Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
@@ -260,6 +187,7 @@
             XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
         }
 
+        // Upload Excel Dapodik (Membaca Seluruh Kolom & Menyimpan Ke Firebase)
         function uploadExcelDapodik() {
             const fileInput = document.getElementById('excel-file');
             if(!fileInput.files.length) return alert('Pilih file Excel terlebih dahulu!');
@@ -273,29 +201,36 @@
                 const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
                 if(rows.length === 0) return alert('File Excel kosong!');
 
-                let headerIdx = 0;
+                let headerIdx = -1;
                 for(let i=0; i<Math.min(rows.length, 15); i++) {
-                    if(rows[i].join(" ").toLowerCase().includes("nama") && (rows[i].join(" ").toLowerCase().includes("nisn") || rows[i].join(" ").toLowerCase().includes("nipd"))) {
+                    const rowStr = rows[i].join(" ").toLowerCase();
+                    if(rowStr.includes("nama") && (rowStr.includes("nisn") || rowStr.includes("nipd"))) {
                         headerIdx = i; break;
                     }
                 }
+                if(headerIdx === -1) headerIdx = 0;
                 const headers = rows[headerIdx].map(h => h.toString().trim());
                 let count = 0;
 
                 for(let i = headerIdx + 1; i < rows.length; i++) {
                     const rowData = rows[i];
                     if(!rowData || rowData.length === 0) continue;
-                    const getVal = (keys) => {
-                        for(let k of keys) {
-                            for(let h=0; h<headers.length; h++) {
-                                if(headers[h].toLowerCase() === k.toLowerCase()) return rowData[h] !== undefined ? rowData[h] : "";
+
+                    const getVal = (possibleKeys) => {
+                        for(let pKey of possibleKeys) {
+                            for(let hIdx=0; hIdx<headers.length; hIdx++) {
+                                if(headers[hIdx].toLowerCase() === pKey.toLowerCase()) {
+                                    return rowData[hIdx] !== undefined ? rowData[hIdx] : "";
+                                }
                             }
                         }
                         return "";
                     };
+
                     const nama = getVal(['nama', 'Nama']);
                     const nisnVal = getVal(['nisn', 'NISN']);
                     if(!nama && !nisnVal) continue;
+
                     const nisn = nisnVal || ('S_' + Date.now() + Math.random().toString().substr(2,4));
 
                     const studentData = {
@@ -305,21 +240,73 @@
                         nipd: getVal(['nipd', 'NIPD']),
                         jk: getVal(['jk', 'JK']),
                         nisn: nisn.toString(),
-                        rombel: getVal(['rombel saat ini', 'Rombel Saat Ini', 'kelas', 'Kelas']),
+                        tempat_lahir: getVal(['tempat lahir', 'Tempat Lahir']),
                         tgl_lahir: getVal(['tanggal lahir', 'Tanggal Lahir']),
-                        tb: getVal(['tinggi badan', 'Tinggi Badan', 'tb']),
-                        bb: getVal(['berat badan', 'Berat Badan', 'bb']),
-                        lingkar_kepala: getVal(['lingkar kepala', 'Lingkar Kepala']),
-                        layak_pip: getVal(['layak pip (usulan dari sekolah)', 'Layak PIP']),
-                        penerima_kip: getVal(['penerima kip', 'Penerima KIP']),
+                        nik: getVal(['nik', 'NIK']),
+                        agama: getVal(['agama', 'Agama']),
+                        alamat: getVal(['alamat', 'Alamat']),
+                        rt: getVal(['rt', 'RT']),
+                        rw: getVal(['rw', 'RW']),
+                        dusun: getVal(['dusun', 'Dusun']),
+                        kelurahan: getVal(['kelurahan', 'Kelurahan']),
+                        kecamatan: getVal(['kecamatan', 'Kecamatan']),
+                        kode_pos: getVal(['kode pos', 'Kode Pos']),
+                        jenis_tinggal: getVal(['jenis tinggal', 'Jenis Tinggal']),
+                        transportasi: getVal(['alat transportasi', 'Alat Transportasi']),
+                        telepon: getVal(['telepon', 'Telepon']),
+                        hp: getVal(['hp', 'HP']),
+                        email: getVal(['e-mail', 'email', 'E-Mail']),
+                        skhun: getVal(['skhun', 'SKHUN']),
+                        penerima_kps: getVal(['penerima kps', 'Penerima KPS']),
+                        no_kps: getVal(['no. kps', 'no kps', 'No. KPS']),
                         nama_ayah: getVal(['nama ayah', 'Nama (Ayah)']),
+                        nik_ayah: getVal(['nik ayah', 'NIK (Ayah)']),
+                        thn_ayah: getVal(['tahun lahir ayah', 'Tahun Lahir (Ayah)']),
+                        pend_ayah: getVal(['jenjang pendidikan ayah', 'Jenjang Pendidikan (Ayah)']),
+                        kerja_ayah: getVal(['pekerjaan ayah', 'Pekerjaan (Ayah)']),
+                        hasil_ayah: getVal(['penghasilan ayah', 'Penghasilan (Ayah)']),
                         nama_ibu: getVal(['nama ibu', 'Nama (Ibu)']),
-                        alamat: getVal(['alamat', 'Alamat'])
+                        nik_ibu: getVal(['nik ibu', 'NIK (Ibu)']),
+                        thn_ibu: getVal(['tahun lahir ibu', 'Tahun Lahir (Ibu)']),
+                        pend_ibu: getVal(['jenjang pendidikan ibu', 'Jenjang Pendidikan (Ibu)']),
+                        kerja_ibu: getVal(['pekerjaan ibu', 'Pekerjaan (Ibu)']),
+                        hasil_ibu: getVal(['penghasilan ibu', 'Penghasilan (Ibu)']),
+                        nama_wali: getVal(['nama wali', 'Nama (Wali)']),
+                        nik_wali: getVal(['nik wali', 'NIK (Wali)']),
+                        thn_wali: getVal(['tahun lahir wali', 'Tahun Lahir (Wali)']),
+                        pend_wali: getVal(['jenjang pendidikan wali', 'Jenjang Pendidikan (Wali)']),
+                        kerja_wali: getVal(['pekerjaan wali', 'Pekerjaan (Wali)']),
+                        hasil_wali: getVal(['penghasilan wali', 'Penghasilan (Wali)']),
+                        rombel: getVal(['rombel saat ini', 'Rombel Saat Ini', 'kelas', 'Kelas']),
+                        no_un: getVal(['no peserta ujian nasional', 'No Peserta Ujian Nasional']),
+                        no_ijazah: getVal(['no seri ijazah', 'No Seri Ijazah']),
+                        penerima_kip: getVal(['penerima kip', 'Penerima KIP']),
+                        no_kip: getVal(['nomor kip', 'Nomor KIP']),
+                        nama_kip: getVal(['nama di kip', 'Nama di KIP']),
+                        no_kks: getVal(['nomor kks', 'Nomor KKS']),
+                        akta: getVal(['no registrasi akta lahir', 'No Registrasi Akta Lahir']),
+                        bank: getVal(['bank', 'Bank']),
+                        norek: getVal(['nomor rekening bank', 'Nomor Rekening Bank']),
+                        an_bank: getVal(['rekening atas nama', 'Rekening Atas Nama']),
+                        layak_pip: getVal(['layak pip (usulan dari sekolah)', 'Layak PIP']),
+                        alasan_pip: getVal(['alasan layak pip', 'Alasan Layak PIP']),
+                        kebutuhan_khusus: getVal(['kebutuhan khusus', 'Kebutuhan Khusus']),
+                        sekolah_asal: getVal(['sekolah asal', 'Sekolah Asal']),
+                        anak_ke: getVal(['anak ke-berapa', 'Anak ke-berapa']),
+                        lintang: getVal(['lintang', 'Lintang']),
+                        bujur: getVal(['bujur', 'Bujur']),
+                        no_kk: getVal(['no kk', 'No KK']),
+                        tb: getVal(['tinggi badan', 'Tinggi Badan', 'tb', 'TB']),
+                        bb: getVal(['berat badan', 'Berat Badan', 'bb', 'BB']),
+                        lingkar_kepala: getVal(['lingkar kepala', 'Lingkar Kepala']),
+                        jml_saudara: getVal(['jml. saudara kandung', 'Jml. Saudara Kandung']),
+                        jarak_sekolah: getVal(['jarak rumah ke sekolah (km)', 'Jarak Rumah ke Sekolah (KM)'])
                     };
+
                     db.ref('siswa/' + nisn).set(studentData);
                     count++;
                 }
-                alert(`Berhasil import ${count} data siswa!`);
+                alert(`Selesai! ${count} data siswa berhasil di-import dengan seluruh atribut lengkap.`);
                 fileInput.value = '';
             };
             reader.readAsArrayBuffer(file);
@@ -341,6 +328,52 @@
             };
             reader.readAsArrayBuffer(fileInput.files[0]);
         }
+
+        function showDetail(key) {
+            const s = allSiswa[key];
+            if(!s) return;
+            document.getElementById('m-title').innerText = `Detail Data Dapodik: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50/70 p-3.5 rounded-lg border border-blue-200">
+                        <h5 class="font-bold text-blue-900 border-b pb-1 mb-2 text-xs uppercase">1. Identitas & Akademik</h5>
+                        <div class="space-y-1">
+                            <p><b>Periode:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
+                            <p><b>Nama Lengkap:</b> ${s.nama || '-'}</p>
+                            <p><b>NISN / NIPD:</b> ${s.nisn || '-'} / ${s.nipd || '-'}</p>
+                            <p><b>NIK:</b> ${s.nik || '-'}</p>
+                            <p><b>JK / Agama:</b> ${s.jk || '-'} / ${s.agama || '-'}</p>
+                            <p><b>TTL:</b> ${s.tempat_lahir || '-'}, ${s.tgl_lahir || '-'}</p>
+                            <p><b>Rombel / Kelas:</b> <span class="font-bold text-blue-800">${s.rombel || s.kelas || '-'}</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-purple-50/70 p-3.5 rounded-lg border border-purple-200">
+                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-2 text-xs uppercase">2. Fisik & Informasi Tambahan</h5>
+                        <div class="space-y-1">
+                            <p><b>Tinggi Badan:</b> <span class="font-bold text-purple-900">${s.tb || '-'} cm</span></p>
+                            <p><b>Berat Badan:</b> <span class="font-bold text-purple-900">${s.bb || '-'} kg</span></p>
+                            <p><b>Lingkar Kepala:</b> <span class="font-bold text-purple-900">${s.lingkar_kepala || '-'} cm</span></p>
+                            <p><b>Anak Ke- / Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
+                            <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200 md:col-span-2">
+                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase">3. Alamat Lengkap & Kontak</h5>
+                        <p><b>Alamat:</b> ${s.alamat || '-'} RT ${s.rt || '-'}/RW ${s.rw || '-'}, ${s.kelurahan || '-'}, ${s.kecamatan || '-'}</p>
+                        <p><b>HP / Email:</b> ${s.hp || '-'} / ${s.email || '-'}</p>
+                    </div>
+                    <div class="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200 md:col-span-2">
+                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase">4. Data Orang Tua & Wali</h5>
+                        <p><b>Ayah:</b> ${s.nama_ayah || '-'} (${s.nik_ayah || '-'}) - Pekerjaan: ${s.kerja_ayah || '-'}</p>
+                        <p><b>Ibu:</b> ${s.nama_ibu || s.ibu || '-'} (${s.nik_ibu || '-'}) - Pekerjaan: ${s.kerja_ibu || '-'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('m-content').innerHTML = html;
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('modal-detail').classList.add('hidden'); }
     </script>
 </body>
 </html>
