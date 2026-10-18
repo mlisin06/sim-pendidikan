@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">PANEL ADMIN & KELOLA DATA</h1>
-                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola, Edit & Hapus Massal</p>
+                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola, Edit, Mutasi & Hapus Massal</p>
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold">
@@ -64,11 +64,11 @@
             </div>
         </section>
 
-        <!-- DIREKTORI TABEL ADMIN (DENGAN MULTI-SELECT HAPUS KELOMPOK & EDIT) -->
+        <!-- DIREKTORI TABEL SISWA AKTIF -->
         <section class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center space-x-3">
-                    <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa</h3>
+                    <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa Aktif</h3>
                     <button onclick="deleteSelectedSiswa()" id="btn-delete-group" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs transition">
                         <i class="fa-solid fa-trash-can mr-1"></i> Hapus Terpilih (<span id="selected-count">0</span>)
                     </button>
@@ -102,9 +102,91 @@
             </div>
         </section>
 
+        <!-- KELOLA MUTASI SISWA (MASUK & KELUAR) -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-arrows-rotate text-blue-700 mr-2"></i>Kelola Mutasi Siswa (Masuk & Keluar)</h3>
+                    <p class="text-xs text-gray-500">Catat pendaftaran siswa baru pindahan (Mutasi Masuk) atau kelola siswa yang keluar.</p>
+                </div>
+                <button onclick="openModalMutasiMasuk()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                    <i class="fa-solid fa-plus mr-1"></i> Tambah Mutasi Masuk
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="p-2 border">Jenis Mutasi</th>
+                            <th class="p-2 border">Tgl Mutasi</th>
+                            <th class="p-2 border">NISN / Nama Siswa</th>
+                            <th class="p-2 border">Rombel</th>
+                            <th class="p-2 border">Sekolah Asal / Tujuan</th>
+                            <th class="p-2 border">Alasan</th>
+                            <th class="p-2 border text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-admin-mutasi" class="divide-y text-xs"></tbody>
+                </table>
+            </div>
+        </section>
+
     </main>
 
-    <!-- MODAL FORM EDIT / TAMBAH DATA SISWA (FULL ATRIBUT) -->
+    <!-- MODAL MUTASI KELUAR -->
+    <div id="modal-mutasi-keluar" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+            <div class="bg-rose-800 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm">Proses Mutasi Keluar Siswa</h4>
+                <button onclick="closeModalMutasiKeluar()" class="text-white hover:text-red-200 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="handleSaveMutasiKeluar(event)" class="p-5 text-xs space-y-3">
+                <input type="hidden" id="mk-nisn">
+                <p><b>Siswa:</b> <span id="mk-nama" class="font-bold text-gray-900"></span> (<span id="mk-nisn-lbl" class="font-mono"></span>)</p>
+                <div><label class="block font-semibold mb-1">Tanggal Mutasi *</label><input type="date" id="mk-tgl" required class="w-full p-2 border rounded"></div>
+                <div><label class="block font-semibold mb-1">Sekolah Tujuan *</label><input type="text" id="mk-sekolah" required placeholder="Nama SD / MI Tujuan" class="w-full p-2 border rounded"></div>
+                <div><label class="block font-semibold mb-1">Alasan Mutasi *</label><input type="text" id="mk-alasan" required placeholder="Misal: Ikut Orang Tua / Pindah Domisili" class="w-full p-2 border rounded"></div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModalMutasiKeluar()" class="bg-gray-400 text-white px-3 py-1.5 rounded">Batal</button>
+                    <button type="submit" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-4 py-1.5 rounded">Simpan Mutasi Keluar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MUTASI MASUK -->
+    <div id="modal-mutasi-masuk" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden">
+            <div class="bg-emerald-800 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm">Tambah Data Mutasi Masuk (Siswa Pindahan)</h4>
+                <button onclick="closeModalMutasiMasuk()" class="text-white hover:text-emerald-200 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="handleSaveMutasiMasuk(event)" class="p-5 text-xs space-y-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-semibold mb-1">Tahun Pelajaran *</label><select id="mm-tp" class="w-full p-2 border rounded"><option value="2025/2026">2025/2026</option><option value="2026/2027">2026/2027</option></select></div>
+                    <div><label class="block font-semibold mb-1">Semester *</label><select id="mm-smt" class="w-full p-2 border rounded"><option value="Ganjil">Ganjil</option><option value="Genap">Genap</option></select></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-semibold mb-1">NISN *</label><input type="text" id="mm-nisn" required class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Nama Lengkap Siswa *</label><input type="text" id="mm-nama" required class="w-full p-2 border rounded"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-semibold mb-1">JK</label><select id="mm-jk" class="w-full p-2 border rounded"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+                    <div><label class="block font-semibold mb-1">Rombel / Kelas *</label><select id="mm-rombel" required class="w-full p-2 border rounded"><option value="Kelas 1">Kelas 1</option><option value="Kelas 2">Kelas 2</option><option value="Kelas 3">Kelas 3</option><option value="Kelas 4">Kelas 4</option><option value="Kelas 5">Kelas 5</option><option value="Kelas 6">Kelas 6</option></select></div>
+                </div>
+                <div><label class="block font-semibold mb-1">Tanggal Masuk *</label><input type="date" id="mm-tgl" required class="w-full p-2 border rounded"></div>
+                <div><label class="block font-semibold mb-1">Sekolah Asal *</label><input type="text" id="mm-sekolah" required placeholder="Nama SD / TK / MI Asal" class="w-full p-2 border rounded"></div>
+                <div><label class="block font-semibold mb-1">Alasan Pindah *</label><input type="text" id="mm-alasan" required placeholder="Pindah Domisili Orang Tua" class="w-full p-2 border rounded"></div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModalMutasiMasuk()" class="bg-gray-400 text-white px-3 py-1.5 rounded">Batal</button>
+                    <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-1.5 rounded">Simpan Siswa Pindahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL FORM EDIT / TAMBAH SISWA (LENGKAP SELURUH ATRIBUT) -->
     <div id="modal-form-siswa" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -113,8 +195,6 @@
             </div>
             
             <form id="form-siswa" onsubmit="handleSaveSiswa(event)" class="p-6 overflow-y-auto text-xs space-y-5">
-                <input type="hidden" id="f-is-edit" value="false">
-
                 <!-- Periode Akademik -->
                 <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 flex flex-wrap items-center gap-4">
                     <span class="font-bold text-blue-900"><i class="fa-solid fa-calendar mr-1"></i> Periode Akademik:</span>
@@ -123,8 +203,6 @@
                         <select id="f-tp" class="p-1 border rounded font-semibold ml-1">
                             <option value="2025/2026">2025/2026</option>
                             <option value="2026/2027">2026/2027</option>
-                            <option value="2027/2028">2027/2028</option>
-                            <option value="2028/2029">2028/2029</option>
                         </select>
                     </div>
                     <div>
@@ -163,7 +241,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Fisik & Informasi Tambahan -->
+                <!-- 2. Fisik & Tambahan -->
                 <div class="bg-purple-50/60 p-4 rounded-lg border space-y-3">
                     <h5 class="font-bold text-purple-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Perkembangan Fisik & Tambahan</h5>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -205,7 +283,7 @@
                     </div>
                 </div>
 
-                <!-- 5. Bantuan & Rekening -->
+                <!-- 5. Bantuan PIP/KIP & Rekening -->
                 <div class="bg-emerald-50/60 p-4 rounded-lg border space-y-3">
                     <h5 class="font-bold text-emerald-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Bantuan PIP/KIP & Rekening Bank</h5>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -220,7 +298,7 @@
 
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeFormModal()" class="bg-gray-400 text-white font-semibold px-4 py-2 rounded text-xs">Batal</button>
-                    <button type="submit" id="btn-save-siswa" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Perubahan</button>
+                    <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -254,13 +332,18 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let allSiswa = {};
+        let allMutasi = {};
 
         db.ref('siswa').on('value', snapshot => {
             allSiswa = snapshot.val() || {};
             renderTableAdmin();
         });
 
-        // Render Tabel Admin
+        db.ref('mutasi').on('value', snapshot => {
+            allMutasi = snapshot.val() || {};
+            renderTableMutasi();
+        });
+
         function renderTableAdmin() {
             const tbody = document.getElementById('tbl-admin-siswa');
             const search = document.getElementById('search-admin').value.toLowerCase();
@@ -269,11 +352,12 @@
 
             const filtered = keys.filter(k => {
                 const s = allSiswa[k];
-                return (s.nama || '').toLowerCase().includes(search) || (s.nisn || '').toString().includes(search) || (s.nik || '').toString().includes(search);
+                const status = s.status || "Aktif";
+                return status === "Aktif" && ((s.nama || '').toLowerCase().includes(search) || (s.nisn || '').toString().includes(search) || (s.nik || '').toString().includes(search));
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Belum ada data siswa ditemukan.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Tidak ada data siswa aktif ditemukan.</td></tr>';
                 updateDeleteGroupButton();
                 return;
             }
@@ -282,9 +366,7 @@
                 const s = allSiswa[k];
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
-                        <td class="p-2 border text-center">
-                            <input type="checkbox" value="${k}" onchange="updateDeleteGroupButton()" class="chk-siswa rounded cursor-pointer">
-                        </td>
+                        <td class="p-2 border text-center"><input type="checkbox" value="${k}" onchange="updateDeleteGroupButton()" class="chk-siswa rounded cursor-pointer"></td>
                         <td class="p-2 border font-mono">${s.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIPD: ${s.nipd || '-'}</span></td>
                         <td class="p-2 border font-bold text-gray-900">${s.nama}</td>
                         <td class="p-2 border">${s.jk || '-'}</td>
@@ -293,67 +375,45 @@
                         <td class="p-2 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
                         <td class="p-2 border text-center space-x-1">
                             <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]">Detail</button>
+                            <button onclick="openModalMutasiKeluar('${k}')" class="bg-rose-700 hover:bg-rose-800 text-white px-2 py-1 rounded text-[10px]">Mutasi</button>
                             <button onclick="openFormEdit('${k}')" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold px-2 py-1 rounded text-[10px]">Edit</button>
                             <button onclick="deleteSingleSiswa('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
                         </td>
                     </tr>
                 `;
             });
-
-            document.getElementById('check-all').checked = false;
             updateDeleteGroupButton();
         }
 
         document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
 
-        // Checkbox Logic Hapus Kelompok
         function toggleSelectAll(master) {
-            const checkboxes = document.querySelectorAll('.chk-siswa');
-            checkboxes.forEach(cb => cb.checked = master.checked);
+            document.querySelectorAll('.chk-siswa').forEach(cb => cb.checked = master.checked);
             updateDeleteGroupButton();
         }
 
         function updateDeleteGroupButton() {
             const selected = document.querySelectorAll('.chk-siswa:checked');
             const btn = document.getElementById('btn-delete-group');
-            const countLbl = document.getElementById('selected-count');
-
-            if(selected.length > 0) {
-                btn.classList.remove('hidden');
-                countLbl.innerText = selected.length;
-            } else {
-                btn.classList.add('hidden');
-            }
+            if(selected.length > 0) { btn.classList.remove('hidden'); document.getElementById('selected-count').innerText = selected.length; }
+            else btn.classList.add('hidden');
         }
 
         function deleteSelectedSiswa() {
             const selected = document.querySelectorAll('.chk-siswa:checked');
             if(selected.length === 0) return;
-
-            if(confirm(`Apakah Anda YAKIN ingin menghapus ${selected.length} data siswa terpilih secara sekaligus?`)) {
-                let promises = [];
-                selected.forEach(cb => {
-                    promises.push(db.ref('siswa/' + cb.value).remove());
-                });
-
-                Promise.all(promises).then(() => {
-                    alert(`Berhasil menghapus ${selected.length} data siswa.`);
-                }).catch(err => {
-                    alert('Gagal menghapus beberapa data: ' + err.message);
-                });
+            if(confirm(`Yakin hapus ${selected.length} siswa terpilih secara sekaligus?`)) {
+                selected.forEach(cb => db.ref('siswa/' + cb.value).remove());
             }
         }
 
         function deleteSingleSiswa(key) {
-            if(confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) {
-                db.ref('siswa/' + key).remove();
-            }
+            if(confirm('Yakin hapus data siswa ini?')) db.ref('siswa/' + key).remove();
         }
 
-        // Form Modal Logic (Tambah / Edit)
+        // Modal Form Edit / Tambah
         function openFormTambah() {
             document.getElementById('form-siswa').reset();
-            document.getElementById('f-is-edit').value = "false";
             document.getElementById('f-nisn').readOnly = false;
             document.getElementById('form-modal-title').innerText = "Tambah Data Siswa Baru";
             document.getElementById('modal-form-siswa').classList.remove('hidden');
@@ -362,8 +422,6 @@
         function openFormEdit(key) {
             const s = allSiswa[key];
             if(!s) return;
-
-            document.getElementById('f-is-edit').value = "true";
             document.getElementById('form-modal-title').innerText = `Edit Data Siswa: ${s.nama || ''}`;
 
             document.getElementById('f-tp').value = s.tahun_pelajaran || '2025/2026';
@@ -416,14 +474,11 @@
             document.getElementById('modal-form-siswa').classList.remove('hidden');
         }
 
-        function closeFormModal() {
-            document.getElementById('modal-form-siswa').classList.add('hidden');
-        }
+        function closeFormModal() { document.getElementById('modal-form-siswa').classList.add('hidden'); }
 
         function handleSaveSiswa(e) {
             e.preventDefault();
             const nisn = document.getElementById('f-nisn').value;
-
             const existing = allSiswa[nisn] || {};
 
             const updatedData = {
@@ -468,18 +523,129 @@
                 no_kip: document.getElementById('f-no-kip').value,
                 bank: document.getElementById('f-bank').value,
                 norek: document.getElementById('f-norek').value,
-                an_bank: document.getElementById('f-an-bank').value
+                an_bank: document.getElementById('f-an-bank').value,
+                status: existing.status || "Aktif"
             };
 
             db.ref('siswa/' + nisn).set(updatedData, err => {
-                if(!err) {
-                    alert('Data siswa berhasil disimpan!');
-                    closeFormModal();
-                } else alert('Gagal menyimpan: ' + err.message);
+                if(!err) { alert('Data siswa berhasil disimpan!'); closeFormModal(); }
+                else alert('Gagal menyimpan: ' + err.message);
             });
         }
 
-        // Upload Excel & Download Template
+        // Logic Mutasi
+        function openModalMutasiKeluar(key) {
+            const s = allSiswa[key];
+            if(!s) return;
+            document.getElementById('mk-nisn').value = s.nisn;
+            document.getElementById('mk-nisn-lbl').innerText = s.nisn;
+            document.getElementById('mk-nama').innerText = s.nama;
+            document.getElementById('modal-mutasi-keluar').classList.remove('hidden');
+        }
+
+        function closeModalMutasiKeluar() { document.getElementById('modal-mutasi-keluar').classList.add('hidden'); }
+
+        function handleSaveMutasiKeluar(e) {
+            e.preventDefault();
+            const nisn = document.getElementById('mk-nisn').value;
+            const s = allSiswa[nisn];
+            if(!s) return;
+
+            const mutasiData = {
+                nisn: nisn,
+                nama_siswa: s.nama,
+                jenis_mutasi: "Keluar",
+                tgl_mutasi: document.getElementById('mk-tgl').value,
+                sekolah_tujuan_asal: document.getElementById('mk-sekolah').value,
+                alasan: document.getElementById('mk-alasan').value,
+                rombel: s.rombel || s.kelas || '-',
+                tahun_pelajaran: s.tahun_pelajaran || "2025/2026",
+                semester: s.semester || "Ganjil"
+            };
+
+            db.ref('mutasi/' + nisn).set(mutasiData);
+            db.ref('siswa/' + nisn + '/status').set("Mutasi Keluar");
+            alert('Siswa berhasil diproses mutasi keluar!');
+            closeModalMutasiKeluar();
+        }
+
+        function openModalMutasiMasuk() { document.getElementById('modal-mutasi-masuk').classList.remove('hidden'); }
+        function closeModalMutasiMasuk() { document.getElementById('modal-mutasi-masuk').classList.add('hidden'); }
+
+        function handleSaveMutasiMasuk(e) {
+            e.preventDefault();
+            const nisn = document.getElementById('mm-nisn').value;
+            const tp = document.getElementById('mm-tp').value;
+            const smt = document.getElementById('mm-smt').value;
+            const nama = document.getElementById('mm-nama').value;
+            const rombel = document.getElementById('mm-rombel').value;
+
+            const studentData = {
+                nisn: nisn,
+                nama: nama,
+                jk: document.getElementById('mm-jk').value,
+                rombel: rombel,
+                tahun_pelajaran: tp,
+                semester: smt,
+                sekolah_asal: document.getElementById('mm-sekolah').value,
+                status: "Aktif"
+            };
+
+            const mutasiData = {
+                nisn: nisn,
+                nama_siswa: nama,
+                jenis_mutasi: "Masuk",
+                tgl_mutasi: document.getElementById('mm-tgl').value,
+                sekolah_tujuan_asal: document.getElementById('mm-sekolah').value,
+                alasan: document.getElementById('mm-alasan').value,
+                rombel: rombel,
+                tahun_pelajaran: tp,
+                semester: smt
+            };
+
+            db.ref('siswa/' + nisn).set(studentData);
+            db.ref('mutasi/' + nisn).set(mutasiData);
+            alert('Siswa mutasi masuk berhasil ditambahkan!');
+            closeModalMutasiMasuk();
+        }
+
+        function renderTableMutasi() {
+            const tbody = document.getElementById('tbl-admin-mutasi');
+            tbody.innerHTML = '';
+            const keys = Object.keys(allMutasi);
+
+            if(keys.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">Belum ada data mutasi.</td></tr>';
+                return;
+            }
+
+            keys.forEach(k => {
+                const m = allMutasi[k];
+                const badgeClass = m.jenis_mutasi === "Masuk" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border font-bold"><span class="px-2 py-0.5 rounded ${badgeClass}">${m.jenis_mutasi}</span></td>
+                        <td class="p-2 border font-mono">${m.tgl_mutasi || '-'}</td>
+                        <td class="p-2 border font-bold text-gray-900">${m.nama_siswa || '-'}<br><span class="text-[10px] text-gray-400 font-mono">NISN: ${m.nisn || '-'}</span></td>
+                        <td class="p-2 border font-bold text-blue-800">${m.rombel || '-'}</td>
+                        <td class="p-2 border">${m.sekolah_tujuan_asal || '-'}</td>
+                        <td class="p-2 border text-gray-600">${m.alasan || '-'}</td>
+                        <td class="p-2 border text-center">
+                            <button onclick="batalkanMutasi('${k}')" class="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded text-[10px]">Batalkan / Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function batalkanMutasi(key) {
+            if(confirm('Batalkan status mutasi ini? (Siswa keluar akan kembali aktif)')) {
+                db.ref('mutasi/' + key).remove();
+                if(allSiswa[key]) db.ref('siswa/' + key + '/status').set("Aktif");
+            }
+        }
+
         function downloadTemplateExcel() {
             const headers = [
                 "Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
@@ -607,7 +773,8 @@
                         bb: getVal(['berat badan', 'Berat Badan', 'bb', 'BB']),
                         lingkar_kepala: getVal(['lingkar kepala', 'Lingkar Kepala']),
                         jml_saudara: getVal(['jml. saudara kandung', 'Jml. Saudara Kandung']),
-                        jarak_sekolah: getVal(['jarak rumah ke sekolah (km)', 'Jarak Rumah ke Sekolah (KM)'])
+                        jarak_sekolah: getVal(['jarak rumah ke sekolah (km)', 'Jarak Rumah ke Sekolah (KM)']),
+                        status: "Aktif"
                     };
 
                     db.ref('siswa/' + nisn).set(studentData);
@@ -661,18 +828,7 @@
                             <p><b>Berat Badan:</b> <span class="font-bold text-purple-900">${s.bb || '-'} kg</span></p>
                             <p><b>Lingkar Kepala:</b> <span class="font-bold text-purple-900">${s.lingkar_kepala || '-'} cm</span></p>
                             <p><b>Anak Ke- / Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
-                            <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
                         </div>
-                    </div>
-                    <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200 md:col-span-2">
-                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase">3. Alamat Lengkap & Kontak</h5>
-                        <p><b>Alamat:</b> ${s.alamat || '-'} RT ${s.rt || '-'}/RW ${s.rw || '-'}, ${s.kelurahan || '-'}, ${s.kecamatan || '-'}</p>
-                        <p><b>HP / Email:</b> ${s.hp || '-'} / ${s.email || '-'}</p>
-                    </div>
-                    <div class="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200 md:col-span-2">
-                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase">4. Data Orang Tua & Wali</h5>
-                        <p><b>Ayah:</b> ${s.nama_ayah || '-'} (${s.nik_ayah || '-'}) - Pekerjaan: ${s.kerja_ayah || '-'}</p>
-                        <p><b>Ibu:</b> ${s.nama_ibu || s.ibu || '-'} (${s.nik_ibu || '-'}) - Pekerjaan: ${s.kerja_ibu || '-'}</p>
                     </div>
                 </div>
             `;
