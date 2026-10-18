@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (Pembaca Excel) -->
+    <!-- SheetJS (Pembaca & Pembuat Excel) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Firebase SDK (v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -64,34 +64,44 @@
             </div>
         </section>
 
-        <!-- Panel Admin & Import Excel -->
+        <!-- Panel Admin & Import/Download Template Excel -->
         <section id="admin" class="bg-white p-6 rounded-xl shadow-sm border border-blue-200 space-y-6">
             <div class="border-b pb-3 flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg font-bold text-blue-900"><i class="fa-solid fa-sliders text-blue-700 mr-2"></i>Panel Kelola Data & Upload Excel</h3>
-                    <p class="text-xs text-gray-500">Form di bawah ini mendukung seluruh 54 kolom data Dapodik secara komplit.</p>
+                    <h3 class="text-lg font-bold text-blue-900"><i class="fa-solid fa-sliders text-blue-700 mr-2"></i>Panel Kelola Data & Template Excel</h3>
+                    <p class="text-xs text-gray-500">Download template untuk isi data, lalu upload kembali untuk masukkan data secara massal.</p>
                 </div>
             </div>
 
-            <!-- Bagian Upload File Excel -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-200">
-                <!-- Import Siswa -->
-                <div class="space-y-2">
-                    <h4 class="font-bold text-blue-900 text-xs"><i class="fa-solid fa-file-excel text-green-600 mr-1"></i>Import Excel Data Siswa Dapodik</h4>
-                    <p class="text-[11px] text-gray-500">Otomatis membaca header 54 kolom Dapodik.</p>
-                    <div class="flex items-center space-x-2">
-                        <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-700 file:text-white hover:file:bg-blue-800">
-                        <button onclick="uploadExcelDapodik()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-1.5 rounded-md text-xs whitespace-nowrap">Import</button>
+            <!-- Fitur Download & Upload Template -->
+            <div class="bg-blue-50/70 p-4 rounded-lg border border-blue-200 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-md border">
+                    <div>
+                        <h4 class="font-bold text-blue-900 text-xs"><i class="fa-solid fa-file-arrow-down text-blue-600 mr-1"></i> Template Excel Data Siswa (54 Kolom Sempurna)</h4>
+                        <p class="text-[11px] text-gray-500">Unduh template kosong ini untuk memudahkan copy-paste data siswa.</p>
                     </div>
+                    <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-md text-xs whitespace-nowrap">
+                        <i class="fa-solid fa-download mr-1"></i> Download Template Excel
+                    </button>
                 </div>
 
-                <!-- Import Guru -->
-                <div class="space-y-2">
-                    <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-file-excel text-green-600 mr-1"></i>Import Excel Data Guru & Tendik</h4>
-                    <p class="text-[11px] text-gray-500">Header: <code class="bg-white px-1 border rounded">nip, nama, jk, ptk, status, pendidikan, hp</code></p>
-                    <div class="flex items-center space-x-2">
-                        <input type="file" id="excel-guru-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-700 file:text-white hover:file:bg-green-800">
-                        <button onclick="uploadExcelGuru()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-4 py-1.5 rounded-md text-xs whitespace-nowrap">Import</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Import Siswa -->
+                    <div class="space-y-2 bg-white p-3 rounded-md border">
+                        <h4 class="font-bold text-blue-900 text-xs"><i class="fa-solid fa-file-excel text-green-600 mr-1"></i>Upload / Import Excel Siswa</h4>
+                        <div class="flex items-center space-x-2">
+                            <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-700 file:text-white hover:file:bg-blue-800">
+                            <button onclick="uploadExcelDapodik()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-4 py-1.5 rounded-md text-xs whitespace-nowrap">Import</button>
+                        </div>
+                    </div>
+
+                    <!-- Import Guru -->
+                    <div class="space-y-2 bg-white p-3 rounded-md border">
+                        <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-file-excel text-green-600 mr-1"></i>Upload / Import Excel Guru</h4>
+                        <div class="flex items-center space-x-2">
+                            <input type="file" id="excel-guru-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-700 file:text-white hover:file:bg-green-800">
+                            <button onclick="uploadExcelGuru()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-4 py-1.5 rounded-md text-xs whitespace-nowrap">Import</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -161,7 +171,6 @@
                     <div class="bg-gray-50 p-4 rounded-lg border space-y-4">
                         <h5 class="font-bold text-blue-900 border-b pb-2 text-sm"><i class="fa-solid fa-users mr-1"></i> 3. Data Orang Tua & Wali</h5>
                         
-                        <!-- Data Ayah -->
                         <div>
                             <span class="font-bold text-gray-700 block mb-2">A. Data Ayah Kandung</span>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -174,7 +183,6 @@
                             </div>
                         </div>
 
-                        <!-- Data Ibu -->
                         <div class="border-t pt-3">
                             <span class="font-bold text-gray-700 block mb-2">B. Data Ibu Kandung</span>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -187,7 +195,6 @@
                             </div>
                         </div>
 
-                        <!-- Data Wali -->
                         <div class="border-t pt-3">
                             <span class="font-bold text-gray-700 block mb-2">C. Data Wali (Opsional)</span>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -457,6 +464,27 @@
             document.getElementById('stat-sarpras').innerText = Object.keys(allSarpras).length;
         });
 
+        // Fungsi Download Template Excel Kosong
+        function downloadTemplateExcel() {
+            const headers = [
+                "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
+                "Alamat", "RT", "RW", "Dusun", "Kelurahan", "Kecamatan", "Kode Pos", "Jenis Tinggal", 
+                "Alat Transportasi", "Telepon", "HP", "E-Mail", "SKHUN", "Penerima KPS", "No. KPS", 
+                "Nama Ayah", "Tahun Lahir Ayah", "Jenjang Pendidikan Ayah", "Pekerjaan Ayah", "Penghasilan Ayah", "NIK Ayah", 
+                "Nama Ibu", "Tahun Lahir Ibu", "Jenjang Pendidikan Ibu", "Pekerjaan Ibu", "Penghasilan Ibu", "NIK Ibu", 
+                "Nama Wali", "Tahun Lahir Wali", "Jenjang Pendidikan Wali", "Pekerjaan Wali", "Penghasilan Wali", "NIK Wali", 
+                "Rombel Saat Ini", "No Peserta Ujian Nasional", "No Seri Ijazah", "Penerima KIP", "Nomor KIP", "Nama di KIP", 
+                "Nomor KKS", "No Registrasi Akta Lahir", "Bank", "Nomor Rekening Bank", "Rekening Atas Nama", 
+                "Layak PIP (usulan dari sekolah)", "Alasan Layak PIP", "Kebutuhan Khusus", "Sekolah Asal", "Anak ke-berapa", 
+                "Lintang", "Bujur", "No KK", "Berat Badan", "Tinggi Badan", "Lingkar Kepala", "Jml. Saudara Kandung", "Jarak Rumah ke Sekolah (KM)"
+            ];
+
+            const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template Siswa");
+            XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
+        }
+
         // Tab Navigation
         function switchTab(tab) {
             document.getElementById('form-siswa').classList.add('hidden');
@@ -508,7 +536,7 @@
 
             filtered.forEach(k => {
                 const s = allSiswa[k];
-                const alamatLengkap = `${s.alamat || ''} RT ${s.rt || '-'}/RW ${s.rw || '-'}, ${s.dusun || ''}, ${s.kelurahan || ''}, ${s.kecamatan || ''}`;
+                const alamatLengkap = `${s.alamat || ''} RT ${s.rt || '-'}/RW ${s.rw || '-'}`;
                 
                 tbody.innerHTML += `
                     <tr class="hover:bg-blue-50/50">
@@ -518,7 +546,7 @@
                         <td class="py-2.5 px-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-bold">${s.rombel || s.kelas || '-'}</span></td>
                         <td class="py-2.5 px-3">${s.tempat_lahir || ''}, ${s.tgl_lahir || ''}</td>
                         <td class="py-2.5 px-3 font-mono">${s.nik || '-'}</td>
-                        <td class="py-2.5 px-3">A: ${s.nama_ayah || '-'}<br>I: ${s.nama_ibu || '-'}</td
+                        <td class="py-2.5 px-3">A: ${s.nama_ayah || '-'}<br>I: ${s.nama_ibu || '-'}</td>
                         <td class="py-2.5 px-3 text-gray-600 max-w-xs truncate">${alamatLengkap}</td>
                         <td class="py-2.5 px-3 space-x-1">
                             <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]">Detail</button>
@@ -594,7 +622,7 @@
         // Upload Excel Dapodik
         function uploadExcelDapodik() {
             const fileInput = document.getElementById('excel-file');
-            if(!fileInput.files.length) return alert('Pilih file Excel hasil unduhan Dapodik terlebih dahulu!');
+            if(!fileInput.files.length) return alert('Pilih file Excel terlebih dahulu!');
 
             const file = fileInput.files[0];
             const reader = new FileReader();
@@ -717,6 +745,44 @@
             reader.readAsArrayBuffer(file);
         }
 
+        // Upload Excel Guru
+        function uploadExcelGuru() {
+            const fileInput = document.getElementById('excel-guru-file');
+            if(!fileInput.files.length) return alert('Pilih file Excel guru terlebih dahulu!');
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheetName = workbook.SheetNames[0];
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+                if(json.length === 0) return alert('File Excel kosong!');
+
+                let count = 0;
+                json.forEach(row => {
+                    const nip = row.nip || row.NIP || ('G_' + Date.now() + Math.random().toString().substr(2,4));
+                    db.ref('guru/' + nip).set({
+                        nip: nip.toString(),
+                        nama: row.nama || row.NAMA || 'Tanpa Nama',
+                        jk: row.jk || row.JK || 'L',
+                        ptk: row.ptk || row.PTK || row.jabatan || 'Guru Kelas',
+                        status: row.status || row.STATUS || 'PNS',
+                        pendidikan: row.pendidikan || row.PENDIDIKAN || '',
+                        hp: row.hp || row.HP || ''
+                    });
+                    count++;
+                });
+
+                alert(`Berhasil mengunggah ${count} data guru ke Firebase!`);
+                fileInput.value = '';
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
         // Simpan Data Siswa Manual / Form Edit Full
         function handleSaveSiswa(e) {
             e.preventDefault();
@@ -737,7 +803,6 @@
                 jml_saudara: document.getElementById('f-jml-saudara').value,
                 kebutuhan_khusus: document.getElementById('f-kebutuhan-khusus').value,
                 sekolah_asal: document.getElementById('f-sekolah-asal').value,
-                // Alamat
                 alamat: document.getElementById('f-alamat').value,
                 rt: document.getElementById('f-rt').value,
                 rw: document.getElementById('f-rw').value,
@@ -753,7 +818,6 @@
                 lintang: document.getElementById('f-lintang').value,
                 bujur: document.getElementById('f-bujur').value,
                 jarak_sekolah: document.getElementById('f-jarak-sekolah').value,
-                // Ortu
                 nama_ayah: document.getElementById('f-nama-ayah').value,
                 nik_ayah: document.getElementById('f-nik-ayah').value,
                 thn_ayah: document.getElementById('f-thn-ayah').value,
@@ -769,7 +833,6 @@
                 nama_wali: document.getElementById('f-nama-wali').value,
                 nik_wali: document.getElementById('f-nik-wali').value,
                 kerja_wali: document.getElementById('f-kerja-wali').value,
-                // Rombel & KIP
                 rombel: document.getElementById('f-rombel').value,
                 no_un: document.getElementById('f-no-un').value,
                 no_ijazah: document.getElementById('f-no-ijazah').value,
@@ -802,7 +865,6 @@
             switchTab('siswa');
             document.getElementById('f-is-edit-siswa').value = "true";
             
-            // Isi semua input
             document.getElementById('f-nisn').value = s.nisn || '';
             document.getElementById('f-nisn').readOnly = true;
             document.getElementById('f-nipd').value = s.nipd || '';
