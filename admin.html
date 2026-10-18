@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kelola Admin - SDN 03 Limbangan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-gray-900 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-yellow-500 p-2 rounded-full text-gray-900">
+                    <i class="fa-solid fa-user-gear text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">PANEL ADMIN & KELOLA DATA</h1>
+                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Khusus Operator & Administrator</p>
+                </div>
+            </div>
+            <nav class="flex space-x-3 text-xs font-semibold">
+                <a href="index.html" class="bg-blue-700 hover:bg-blue-800 text-white py-1.5 px-3 rounded">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Kembali Ke Dashboard Rekap
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 flex-grow space-y-8">
+
+        <!-- PANEL IMPORT EXCEL & DOWNLOAD TEMPLATE -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <div class="border-b pb-3 flex justify-between items-center">
+                <div>
+                    <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal (Excel Dapodik)</h3>
+                    <p class="text-xs text-gray-500">Gunakan template resmi untuk mengunggah puluhan data sekaligus.</p>
+                </div>
+                <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-md text-xs">
+                    <i class="fa-solid fa-download mr-1"></i> Download Template Excel
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Import Siswa -->
+                <div class="bg-blue-50/60 p-4 rounded-lg border border-blue-200 space-y-2">
+                    <h4 class="font-bold text-blue-900 text-xs"><i class="fa-solid fa-upload text-blue-700 mr-1"></i>Upload File Excel Siswa</h4>
+                    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-700 file:text-white">
+                    <button onclick="uploadExcelDapodik()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-md text-xs">Proses Import Data Siswa</button>
+                </div>
+
+                <!-- Import Guru -->
+                <div class="bg-green-50/60 p-4 rounded-lg border border-green-200 space-y-2">
+                    <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-upload text-green-700 mr-1"></i>Upload File Excel Guru</h4>
+                    <input type="file" id="excel-guru-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-700 file:text-white">
+                    <button onclick="uploadExcelGuru()" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-md text-xs">Proses Import Data Guru</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORM INPUT MANUAL -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <div class="flex space-x-2 border-b pb-2">
+                <button onclick="switchTab('siswa')" id="tab-btn-siswa" class="px-3 py-1.5 font-bold text-xs text-blue-700 border-b-2 border-blue-700">Form Input Siswa</button>
+                <button onclick="switchTab('guru')" id="tab-btn-guru" class="px-3 py-1.5 font-bold text-xs text-gray-500 border-b-2 border-transparent hover:text-blue-700">Form Input Guru</button>
+                <button onclick="switchTab('sarpras')" id="tab-btn-sarpras" class="px-3 py-1.5 font-bold text-xs text-gray-500 border-b-2 border-transparent hover:text-blue-700">Form Input Sarpras</button>
+            </div>
+
+            <!-- Form Siswa -->
+            <form id="form-siswa" onsubmit="handleSaveSiswa(event)" class="space-y-4 text-xs">
+                <div class="bg-blue-50 p-3 rounded-lg border flex items-center space-x-4">
+                    <span class="font-bold text-blue-900">Target Periode:</span>
+                    <div>
+                        <label class="font-semibold">Tahun Pelajaran:</label>
+                        <select id="f-tp-siswa" class="p-1 border rounded font-semibold ml-1">
+                            <option value="2025/2026" selected>2025/2026</option>
+                            <option value="2026/2027">2026/2027</option>
+                            <option value="2027/2028">2027/2028</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-semibold">Semester:</label>
+                        <select id="f-smt-siswa" class="p-1 border rounded font-semibold ml-1">
+                            <option value="Ganjil" selected>Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-lg border">
+                    <div><label class="block font-semibold mb-1">NISN *</label><input type="text" id="f-nisn" required class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">NIPD / NIS</label><input type="text" id="f-nipd" class="w-full p-2 border rounded"></div>
+                    <div class="md:col-span-2"><label class="block font-semibold mb-1">Nama Lengkap *</label><input type="text" id="f-nama" required class="w-full p-2 border rounded"></div>
+                    <div>
+                        <label class="block font-semibold mb-1">JK</label>
+                        <select id="f-jk" class="w-full p-2 border rounded"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Rombel / Kelas *</label>
+                        <select id="f-rombel" required class="w-full p-2 border rounded">
+                            <option value="Kelas 1">Kelas 1</option>
+                            <option value="Kelas 2">Kelas 2</option>
+                            <option value="Kelas 3">Kelas 3</option>
+                            <option value="Kelas 4">Kelas 4</option>
+                            <option value="Kelas 5">Kelas 5</option>
+                            <option value="Kelas 6">Kelas 6</option>
+                        </select>
+                    </div>
+                    <div><label class="block font-semibold mb-1">NIK</label><input type="text" id="f-nik" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Tanggal Lahir</label><input type="date" id="f-tgl-lahir" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Tinggi Badan (cm)</label><input type="number" id="f-tb" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Berat Badan (kg)</label><input type="number" id="f-bb" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Lingkar Kepala (cm)</label><input type="number" id="f-lingkar-kepala" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Layak PIP / KIP</label><input type="text" id="f-layak-pip" placeholder="Ya / Tidak" class="w-full p-2 border rounded"></div>
+                </div>
+
+                <button type="submit" class="bg-blue-700 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Data Siswa</button>
+            </form>
+        </section>
+
+        <!-- DIREKTORI TABEL SISWA -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+            <h3 class="text-base font-bold text-gray-800 border-b pb-2"><i class="fa-solid fa-users text-blue-700 mr-2"></i>Daftar Direktori Siswa</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold">
+                            <th class="p-2 border">NISN</th>
+                            <th class="p-2 border">Nama</th>
+                            <th class="p-2 border">JK</th>
+                            <th class="p-2 border">Rombel</th>
+                            <th class="p-2 border">Periode</th>
+                            <th class="p-2 border">Fisik (TB/BB/LK)</th>
+                            <th class="p-2 border">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-admin-siswa" class="divide-y"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5Ak7WXjVb34N38eKrbEgs-N7HhGWFX1I",
+            authDomain: "sim-sdn03limbangan.firebaseapp.com",
+            databaseURL: "https://sim-sdn03limbangan-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "sim-sdn03limbangan",
+            storageBucket: "sim-sdn03limbangan.firebasestorage.app",
+            messagingSenderId: "919464755426",
+            appId: "1:919464755426:web:eb18a6c41bcd5b4ead1ebb"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let allSiswa = {};
+
+        db.ref('siswa').on('value', snapshot => {
+            allSiswa = snapshot.val() || {};
+            renderTableSiswa();
+        });
+
+        function renderTableSiswa() {
+            const tbody = document.getElementById('tbl-admin-siswa');
+            tbody.innerHTML = '';
+            const keys = Object.keys(allSiswa);
+
+            keys.forEach(k => {
+                const s = allSiswa[k];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border font-mono">${s.nisn || '-'}</td>
+                        <td class="p-2 border font-bold">${s.nama}</td>
+                        <td class="p-2 border">${s.jk || '-'}</td>
+                        <td class="p-2 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
+                        <td class="p-2 border">${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</td>
+                        <td class="p-2 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
+                        <td class="p-2 border">
+                            <button onclick="deleteSiswa('${k}')" class="bg-red-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteSiswa(key) {
+            if(confirm('Hapus siswa ini?')) db.ref('siswa/' + key).remove();
+        }
+
+        function handleSaveSiswa(e) {
+            e.preventDefault();
+            const nisn = document.getElementById('f-nisn').value;
+            const data = {
+                nisn: nisn,
+                nama: document.getElementById('f-nama').value,
+                jk: document.getElementById('f-jk').value,
+                rombel: document.getElementById('f-rombel').value,
+                tahun_pelajaran: document.getElementById('f-tp-siswa').value,
+                semester: document.getElementById('f-smt-siswa').value,
+                tb: document.getElementById('f-tb').value,
+                bb: document.getElementById('f-bb').value,
+                lingkar_kepala: document.getElementById('f-lingkar-kepala').value,
+                layak_pip: document.getElementById('f-layak-pip').value
+            };
+            db.ref('siswa/' + nisn).set(data, () => alert('Berhasil disimpan!'));
+        }
+
+        function downloadTemplateExcel() {
+            const headers = [
+                ["Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Rombel Saat Ini", "Layak PIP", "Tinggi Badan", "Berat Badan", "Lingkar Kepala"]
+            ];
+            const worksheet = XLSX.utils.aoa_to_sheet(headers);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+            XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
+        }
+    </script>
+</body>
+</html>
