@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">PANEL ADMIN & KELOLA DATA</h1>
-                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola, Edit & Hapus Data</p>
+                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola, Edit & Hapus Massal</p>
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold">
@@ -64,24 +64,37 @@
             </div>
         </section>
 
-        <!-- DIREKTORI TABEL ADMIN (LENGKAP DENGAN EDIT & HAPUS) -->
+        <!-- DIREKTORI TABEL ADMIN (DENGAN MULTI-SELECT HAPUS KELOMPOK & EDIT) -->
         <section class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b pb-2">
-                <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa (Admin)</h3>
-                <input type="text" id="search-admin" placeholder="Cari NISN / Nama / NIK..." class="px-3 py-1.5 border rounded text-xs w-full sm:w-64">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-3">
+                <div class="flex items-center space-x-3">
+                    <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-users-gear text-blue-700 mr-2"></i>Kelola Direktori Siswa</h3>
+                    <button onclick="deleteSelectedSiswa()" id="btn-delete-group" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Hapus Terpilih (<span id="selected-count">0</span>)
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2 w-full md:w-auto">
+                    <input type="text" id="search-admin" placeholder="Cari NISN / Nama / NIK..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
+                    <button onclick="openFormTambah()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                        <i class="fa-solid fa-plus mr-1"></i> Tambah Siswa
+                    </button>
+                </div>
             </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="p-2 border text-center w-10">
+                                <input type="checkbox" id="check-all" onclick="toggleSelectAll(this)" class="rounded cursor-pointer">
+                            </th>
                             <th class="p-2 border">NISN / NIPD</th>
                             <th class="p-2 border">Nama Lengkap</th>
                             <th class="p-2 border">JK</th>
                             <th class="p-2 border">Kelas</th>
                             <th class="p-2 border">Periode</th>
-                            <th class="p-2 border">Orang Tua (A / I)</th>
                             <th class="p-2 border">Fisik (TB/BB/LK)</th>
-                            <th class="p-2 border">Aksi Admin</th>
+                            <th class="p-2 border text-center">Aksi Admin</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-admin-siswa" class="divide-y"></tbody>
@@ -91,9 +104,131 @@
 
     </main>
 
+    <!-- MODAL FORM EDIT / TAMBAH DATA SISWA (FULL ATRIBUT) -->
+    <div id="modal-form-siswa" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm" id="form-modal-title">Edit Data Siswa</h4>
+                <button onclick="closeFormModal()" class="text-white hover:text-red-300 font-bold text-lg">&times;</button>
+            </div>
+            
+            <form id="form-siswa" onsubmit="handleSaveSiswa(event)" class="p-6 overflow-y-auto text-xs space-y-5">
+                <input type="hidden" id="f-is-edit" value="false">
+
+                <!-- Periode Akademik -->
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 flex flex-wrap items-center gap-4">
+                    <span class="font-bold text-blue-900"><i class="fa-solid fa-calendar mr-1"></i> Periode Akademik:</span>
+                    <div>
+                        <label class="font-semibold text-gray-700">Tahun Pelajaran:</label>
+                        <select id="f-tp" class="p-1 border rounded font-semibold ml-1">
+                            <option value="2025/2026">2025/2026</option>
+                            <option value="2026/2027">2026/2027</option>
+                            <option value="2027/2028">2027/2028</option>
+                            <option value="2028/2029">2028/2029</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700">Semester:</label>
+                        <select id="f-smt" class="p-1 border rounded font-semibold ml-1">
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 1. Identitas Utama & Akademik -->
+                <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                    <h5 class="font-bold text-blue-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-id-card mr-1"></i> 1. Identitas & Akademik</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div><label class="block font-semibold mb-1">NISN *</label><input type="text" id="f-nisn" required class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">NIPD / NIS</label><input type="text" id="f-nipd" class="w-full p-2 border rounded"></div>
+                        <div class="md:col-span-2"><label class="block font-semibold mb-1">Nama Lengkap *</label><input type="text" id="f-nama" required class="w-full p-2 border rounded"></div>
+                        <div>
+                            <label class="block font-semibold mb-1">Jenis Kelamin</label>
+                            <select id="f-jk" class="w-full p-2 border rounded"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Rombel / Kelas *</label>
+                            <select id="f-rombel" required class="w-full p-2 border rounded">
+                                <option value="Kelas 1">Kelas 1</option><option value="Kelas 2">Kelas 2</option><option value="Kelas 3">Kelas 3</option>
+                                <option value="Kelas 4">Kelas 4</option><option value="Kelas 5">Kelas 5</option><option value="Kelas 6">Kelas 6</option>
+                            </select>
+                        </div>
+                        <div><label class="block font-semibold mb-1">NIK</label><input type="text" id="f-nik" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Tempat Lahir</label><input type="text" id="f-tempat-lahir" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Tanggal Lahir</label><input type="date" id="f-tgl-lahir" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Agama</label><input type="text" id="f-agama" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">No Reg Akta Lahir</label><input type="text" id="f-akta" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Sekolah Asal</label><input type="text" id="f-sekolah-asal" class="w-full p-2 border rounded"></div>
+                    </div>
+                </div>
+
+                <!-- 2. Fisik & Informasi Tambahan -->
+                <div class="bg-purple-50/60 p-4 rounded-lg border space-y-3">
+                    <h5 class="font-bold text-purple-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Perkembangan Fisik & Tambahan</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div><label class="block font-semibold mb-1">Tinggi Badan (cm)</label><input type="number" id="f-tb" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Berat Badan (kg)</label><input type="number" id="f-bb" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Lingkar Kepala (cm)</label><input type="number" id="f-lingkar-kepala" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Anak Ke-berapa</label><input type="number" id="f-anak-ke" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Jml Saudara Kandung</label><input type="number" id="f-jml-saudara" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Kebutuhan Khusus</label><input type="text" id="f-kebutuhan-khusus" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Jenis Tinggal</label><input type="text" id="f-jenis-tinggal" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Alat Transportasi</label><input type="text" id="f-transportasi" class="w-full p-2 border rounded"></div>
+                    </div>
+                </div>
+
+                <!-- 3. Alamat Lengkap & Kontak -->
+                <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                    <h5 class="font-bold text-gray-800 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat Lengkap & Kontak</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div class="md:col-span-2"><label class="block font-semibold mb-1">Alamat Jalan / Dusun</label><input type="text" id="f-alamat" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">RT / RW</label><div class="flex space-x-1"><input type="text" id="f-rt" placeholder="RT" class="w-1/2 p-2 border rounded"><input type="text" id="f-rw" placeholder="RW" class="w-1/2 p-2 border rounded"></div></div>
+                        <div><label class="block font-semibold mb-1">Kelurahan / Desa</label><input type="text" id="f-kelurahan" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Kecamatan</label><input type="text" id="f-kecamatan" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Kode Pos</label><input type="text" id="f-kode-pos" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">HP / WhatsApp</label><input type="text" id="f-hp" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">E-Mail</label><input type="email" id="f-email" class="w-full p-2 border rounded"></div>
+                    </div>
+                </div>
+
+                <!-- 4. Data Orang Tua -->
+                <div class="bg-amber-50/60 p-4 rounded-lg border space-y-3">
+                    <h5 class="font-bold text-amber-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div><label class="block font-semibold mb-1">Nama Ayah</label><input type="text" id="f-nama-ayah" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">NIK Ayah</label><input type="text" id="f-nik-ayah" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Pekerjaan Ayah</label><input type="text" id="f-kerja-ayah" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Nama Ibu</label><input type="text" id="f-nama-ibu" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">NIK Ibu</label><input type="text" id="f-nik-ibu" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Pekerjaan Ibu</label><input type="text" id="f-kerja-ibu" class="w-full p-2 border rounded"></div>
+                    </div>
+                </div>
+
+                <!-- 5. Bantuan & Rekening -->
+                <div class="bg-emerald-50/60 p-4 rounded-lg border space-y-3">
+                    <h5 class="font-bold text-emerald-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Bantuan PIP/KIP & Rekening Bank</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div><label class="block font-semibold mb-1">Layak PIP (Usulan)</label><input type="text" id="f-layak-pip" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Penerima KIP</label><input type="text" id="f-penerima-kip" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Nomor KIP</label><input type="text" id="f-no-kip" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Bank Rekening</label><input type="text" id="f-bank" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">No Rekening Bank</label><input type="text" id="f-norek" class="w-full p-2 border rounded"></div>
+                        <div><label class="block font-semibold mb-1">Rekening Atas Nama</label><input type="text" id="f-an-bank" class="w-full p-2 border rounded"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeFormModal()" class="bg-gray-400 text-white font-semibold px-4 py-2 rounded text-xs">Batal</button>
+                    <button type="submit" id="btn-save-siswa" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Detail Admin -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
                 <h4 class="font-bold text-sm" id="m-title">Detail Lengkap Siswa</h4>
                 <button onclick="closeModal()" class="text-white hover:text-red-300 font-bold text-lg">&times;</button>
@@ -125,6 +260,7 @@
             renderTableAdmin();
         });
 
+        // Render Tabel Admin
         function renderTableAdmin() {
             const tbody = document.getElementById('tbl-admin-siswa');
             const search = document.getElementById('search-admin').value.toLowerCase();
@@ -137,7 +273,8 @@
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Belum ada data siswa.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Belum ada data siswa ditemukan.</td></tr>';
+                updateDeleteGroupButton();
                 return;
             }
 
@@ -145,29 +282,204 @@
                 const s = allSiswa[k];
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
+                        <td class="p-2 border text-center">
+                            <input type="checkbox" value="${k}" onchange="updateDeleteGroupButton()" class="chk-siswa rounded cursor-pointer">
+                        </td>
                         <td class="p-2 border font-mono">${s.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIPD: ${s.nipd || '-'}</span></td>
                         <td class="p-2 border font-bold text-gray-900">${s.nama}</td>
                         <td class="p-2 border">${s.jk || '-'}</td>
                         <td class="p-2 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
                         <td class="p-2 border font-mono text-[11px]">${s.tahun_pelajaran || '2025/2026'}<br><span class="text-gray-400 text-[10px]">${s.semester || 'Ganjil'}</span></td>
-                        <td class="p-2 border">A: ${s.nama_ayah || '-'}<br>I: ${s.nama_ibu || s.ibu || '-'}</td>
                         <td class="p-2 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
-                        <td class="p-2 border space-x-1">
+                        <td class="p-2 border text-center space-x-1">
                             <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]">Detail</button>
-                            <button onclick="deleteSiswa('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
+                            <button onclick="openFormEdit('${k}')" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold px-2 py-1 rounded text-[10px]">Edit</button>
+                            <button onclick="deleteSingleSiswa('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
                         </td>
                     </tr>
                 `;
             });
+
+            document.getElementById('check-all').checked = false;
+            updateDeleteGroupButton();
         }
 
         document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
 
-        function deleteSiswa(key) {
-            if(confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) db.ref('siswa/' + key).remove();
+        // Checkbox Logic Hapus Kelompok
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.chk-siswa');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+            updateDeleteGroupButton();
         }
 
-        // Download Template Excel Full 68 Kolom Dapodik
+        function updateDeleteGroupButton() {
+            const selected = document.querySelectorAll('.chk-siswa:checked');
+            const btn = document.getElementById('btn-delete-group');
+            const countLbl = document.getElementById('selected-count');
+
+            if(selected.length > 0) {
+                btn.classList.remove('hidden');
+                countLbl.innerText = selected.length;
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function deleteSelectedSiswa() {
+            const selected = document.querySelectorAll('.chk-siswa:checked');
+            if(selected.length === 0) return;
+
+            if(confirm(`Apakah Anda YAKIN ingin menghapus ${selected.length} data siswa terpilih secara sekaligus?`)) {
+                let promises = [];
+                selected.forEach(cb => {
+                    promises.push(db.ref('siswa/' + cb.value).remove());
+                });
+
+                Promise.all(promises).then(() => {
+                    alert(`Berhasil menghapus ${selected.length} data siswa.`);
+                }).catch(err => {
+                    alert('Gagal menghapus beberapa data: ' + err.message);
+                });
+            }
+        }
+
+        function deleteSingleSiswa(key) {
+            if(confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) {
+                db.ref('siswa/' + key).remove();
+            }
+        }
+
+        // Form Modal Logic (Tambah / Edit)
+        function openFormTambah() {
+            document.getElementById('form-siswa').reset();
+            document.getElementById('f-is-edit').value = "false";
+            document.getElementById('f-nisn').readOnly = false;
+            document.getElementById('form-modal-title').innerText = "Tambah Data Siswa Baru";
+            document.getElementById('modal-form-siswa').classList.remove('hidden');
+        }
+
+        function openFormEdit(key) {
+            const s = allSiswa[key];
+            if(!s) return;
+
+            document.getElementById('f-is-edit').value = "true";
+            document.getElementById('form-modal-title').innerText = `Edit Data Siswa: ${s.nama || ''}`;
+
+            document.getElementById('f-tp').value = s.tahun_pelajaran || '2025/2026';
+            document.getElementById('f-smt').value = s.semester || 'Ganjil';
+            document.getElementById('f-nisn').value = s.nisn || '';
+            document.getElementById('f-nisn').readOnly = true;
+            document.getElementById('f-nipd').value = s.nipd || '';
+            document.getElementById('f-nama').value = s.nama || '';
+            document.getElementById('f-jk').value = s.jk || 'L';
+            document.getElementById('f-rombel').value = s.rombel || s.kelas || 'Kelas 1';
+            document.getElementById('f-nik').value = s.nik || '';
+            document.getElementById('f-tempat-lahir').value = s.tempat_lahir || '';
+            document.getElementById('f-tgl-lahir').value = s.tgl_lahir || '';
+            document.getElementById('f-agama').value = s.agama || '';
+            document.getElementById('f-akta').value = s.akta || '';
+            document.getElementById('f-sekolah-asal').value = s.sekolah_asal || '';
+
+            document.getElementById('f-tb').value = s.tb || '';
+            document.getElementById('f-bb').value = s.bb || '';
+            document.getElementById('f-lingkar-kepala').value = s.lingkar_kepala || '';
+            document.getElementById('f-anak-ke').value = s.anak_ke || '';
+            document.getElementById('f-jml-saudara').value = s.jml_saudara || '';
+            document.getElementById('f-kebutuhan-khusus').value = s.kebutuhan_khusus || '';
+            document.getElementById('f-jenis-tinggal').value = s.jenis_tinggal || '';
+            document.getElementById('f-transportasi').value = s.transportasi || '';
+
+            document.getElementById('f-alamat').value = s.alamat || '';
+            document.getElementById('f-rt').value = s.rt || '';
+            document.getElementById('f-rw').value = s.rw || '';
+            document.getElementById('f-kelurahan').value = s.kelurahan || '';
+            document.getElementById('f-kecamatan').value = s.kecamatan || '';
+            document.getElementById('f-kode-pos').value = s.kode_pos || '';
+            document.getElementById('f-hp').value = s.hp || '';
+            document.getElementById('f-email').value = s.email || '';
+
+            document.getElementById('f-nama-ayah').value = s.nama_ayah || '';
+            document.getElementById('f-nik-ayah').value = s.nik_ayah || '';
+            document.getElementById('f-kerja-ayah').value = s.kerja_ayah || '';
+            document.getElementById('f-nama-ibu').value = s.nama_ibu || s.ibu || '';
+            document.getElementById('f-nik-ibu').value = s.nik_ibu || '';
+            document.getElementById('f-kerja-ibu').value = s.kerja_ibu || '';
+
+            document.getElementById('f-layak-pip').value = s.layak_pip || '';
+            document.getElementById('f-penerima-kip').value = s.penerima_kip || '';
+            document.getElementById('f-no-kip').value = s.no_kip || '';
+            document.getElementById('f-bank').value = s.bank || '';
+            document.getElementById('f-norek').value = s.norek || '';
+            document.getElementById('f-an-bank').value = s.an_bank || '';
+
+            document.getElementById('modal-form-siswa').classList.remove('hidden');
+        }
+
+        function closeFormModal() {
+            document.getElementById('modal-form-siswa').classList.add('hidden');
+        }
+
+        function handleSaveSiswa(e) {
+            e.preventDefault();
+            const nisn = document.getElementById('f-nisn').value;
+
+            const existing = allSiswa[nisn] || {};
+
+            const updatedData = {
+                ...existing,
+                tahun_pelajaran: document.getElementById('f-tp').value,
+                semester: document.getElementById('f-smt').value,
+                nisn: nisn,
+                nipd: document.getElementById('f-nipd').value,
+                nama: document.getElementById('f-nama').value,
+                jk: document.getElementById('f-jk').value,
+                rombel: document.getElementById('f-rombel').value,
+                nik: document.getElementById('f-nik').value,
+                tempat_lahir: document.getElementById('f-tempat-lahir').value,
+                tgl_lahir: document.getElementById('f-tgl-lahir').value,
+                agama: document.getElementById('f-agama').value,
+                akta: document.getElementById('f-akta').value,
+                sekolah_asal: document.getElementById('f-sekolah-asal').value,
+                tb: document.getElementById('f-tb').value,
+                bb: document.getElementById('f-bb').value,
+                lingkar_kepala: document.getElementById('f-lingkar-kepala').value,
+                anak_ke: document.getElementById('f-anak-ke').value,
+                jml_saudara: document.getElementById('f-jml-saudara').value,
+                kebutuhan_khusus: document.getElementById('f-kebutuhan-khusus').value,
+                jenis_tinggal: document.getElementById('f-jenis-tinggal').value,
+                transportasi: document.getElementById('f-transportasi').value,
+                alamat: document.getElementById('f-alamat').value,
+                rt: document.getElementById('f-rt').value,
+                rw: document.getElementById('f-rw').value,
+                kelurahan: document.getElementById('f-kelurahan').value,
+                kecamatan: document.getElementById('f-kecamatan').value,
+                kode_pos: document.getElementById('f-kode-pos').value,
+                hp: document.getElementById('f-hp').value,
+                email: document.getElementById('f-email').value,
+                nama_ayah: document.getElementById('f-nama-ayah').value,
+                nik_ayah: document.getElementById('f-nik-ayah').value,
+                kerja_ayah: document.getElementById('f-kerja-ayah').value,
+                nama_ibu: document.getElementById('f-nama-ibu').value,
+                nik_ibu: document.getElementById('f-nik-ibu').value,
+                kerja_ibu: document.getElementById('f-kerja-ibu').value,
+                layak_pip: document.getElementById('f-layak-pip').value,
+                penerima_kip: document.getElementById('f-penerima-kip').value,
+                no_kip: document.getElementById('f-no-kip').value,
+                bank: document.getElementById('f-bank').value,
+                norek: document.getElementById('f-norek').value,
+                an_bank: document.getElementById('f-an-bank').value
+            };
+
+            db.ref('siswa/' + nisn).set(updatedData, err => {
+                if(!err) {
+                    alert('Data siswa berhasil disimpan!');
+                    closeFormModal();
+                } else alert('Gagal menyimpan: ' + err.message);
+            });
+        }
+
+        // Upload Excel & Download Template
         function downloadTemplateExcel() {
             const headers = [
                 "Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
@@ -187,7 +499,6 @@
             XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
         }
 
-        // Upload Excel Dapodik (Membaca Seluruh Kolom & Menyimpan Ke Firebase)
         function uploadExcelDapodik() {
             const fileInput = document.getElementById('excel-file');
             if(!fileInput.files.length) return alert('Pilih file Excel terlebih dahulu!');
@@ -273,10 +584,6 @@
                         hasil_ibu: getVal(['penghasilan ibu', 'Penghasilan (Ibu)']),
                         nama_wali: getVal(['nama wali', 'Nama (Wali)']),
                         nik_wali: getVal(['nik wali', 'NIK (Wali)']),
-                        thn_wali: getVal(['tahun lahir wali', 'Tahun Lahir (Wali)']),
-                        pend_wali: getVal(['jenjang pendidikan wali', 'Jenjang Pendidikan (Wali)']),
-                        kerja_wali: getVal(['pekerjaan wali', 'Pekerjaan (Wali)']),
-                        hasil_wali: getVal(['penghasilan wali', 'Penghasilan (Wali)']),
                         rombel: getVal(['rombel saat ini', 'Rombel Saat Ini', 'kelas', 'Kelas']),
                         no_un: getVal(['no peserta ujian nasional', 'No Peserta Ujian Nasional']),
                         no_ijazah: getVal(['no seri ijazah', 'No Seri Ijazah']),
@@ -306,7 +613,7 @@
                     db.ref('siswa/' + nisn).set(studentData);
                     count++;
                 }
-                alert(`Selesai! ${count} data siswa berhasil di-import dengan seluruh atribut lengkap.`);
+                alert(`Selesai! ${count} data siswa berhasil di-import.`);
                 fileInput.value = '';
             };
             reader.readAsArrayBuffer(file);
