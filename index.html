@@ -86,12 +86,19 @@
         </div>
 
         <!-- KARTU RINGKASAN UTAMA -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
                 <div class="p-3 bg-blue-100 text-blue-700 rounded-lg text-xl"><i class="fa-solid fa-user-graduate"></i></div>
                 <div>
                     <span class="text-[11px] text-gray-500 block">Total Siswa Aktif</span>
                     <span id="stat-siswa" class="text-xl font-extrabold text-blue-900">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
+                <div class="p-3 bg-indigo-100 text-indigo-700 rounded-lg text-xl"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div>
+                    <span class="text-[11px] text-gray-500 block">Total Lulusan / Alumni</span>
+                    <span id="stat-alumni" class="text-xl font-extrabold text-indigo-900">0</span>
                 </div>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
@@ -144,6 +151,39 @@
                             <td class="py-2.5 px-3 border text-yellow-800" id="tot-pip">0</td>
                         </tr>
                     </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- TABEL REKAPITULASI DATA KELULUSAN & ALUMNI -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
+                <div>
+                    <h3 class="font-bold text-sm text-indigo-900"><i class="fa-solid fa-graduation-cap text-indigo-700 mr-2"></i>Rekapitulasi Data Kelulusan & Alumni</h3>
+                    <p class="text-[11px] text-gray-500">Daftar rekap jumlah dan arsip siswa yang telah lulus dari SDN 03 Limbangan.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-[11px] font-bold text-gray-600">Filter Tahun Lulus:</label>
+                    <select id="public-filter-lulus-thn" onchange="renderPublicAlumni()" class="px-2.5 py-1 border rounded text-xs font-semibold bg-white focus:ring-1 focus:ring-indigo-500">
+                        <option value="">Semua Tahun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="py-2 px-3 border w-12 text-center">No</th>
+                            <th class="py-2 px-3 border">NISN / NIS</th>
+                            <th class="py-2 px-3 border">Nama Alumni</th>
+                            <th class="py-2 px-3 border">JK</th>
+                            <th class="py-2 px-3 border">Tahun Lulus</th>
+                            <th class="py-2 px-3 border">No. Ijazah / SKHU</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-public-alumni" class="divide-y text-xs">
+                        <tr><td colspan="6" class="text-center py-4 text-gray-400">Memuat data rekap lulusan...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -316,6 +356,7 @@
         let allSiswa = {};
         let allGuru = {};
         let allMutasi = {};
+        let allAlumni = {};
         let chartPIPInstance = null;
         let chartJKInstance = null;
         let chartUsiaInstance = null;
@@ -375,6 +416,72 @@
             allMutasi = snapshot.val() || {};
             renderPubMutasi();
         });
+
+        db.ref('alumni').on('value', snapshot => {
+            allAlumni = snapshot.val() || {};
+            const totalAlumni = Object.keys(allAlumni).length;
+            const elStat = document.getElementById('stat-alumni');
+            if(elStat) elStat.innerText = totalAlumni;
+
+            updatePublicAlumniDropdown();
+            renderPublicAlumni();
+        });
+
+        function updatePublicAlumniDropdown() {
+            const selectThn = document.getElementById('public-filter-lulus-thn');
+            if(!selectThn) return;
+            const currentSelected = selectThn.value;
+            let thnSet = new Set();
+            
+            Object.values(allAlumni).forEach(a => { 
+                if(a.tahun_lulus) thnSet.add(a.tahun_lulus.trim()); 
+            });
+
+            const sortedThn = Array.from(thnSet).sort().reverse();
+            selectThn.innerHTML = '<option value="">Semua Tahun</option>';
+            sortedThn.forEach(thn => {
+                const opt = document.createElement('option');
+                opt.value = thn; 
+                opt.innerText = thn;
+                if(thn === currentSelected) opt.selected = true;
+                selectThn.appendChild(opt);
+            });
+        }
+
+        function renderPublicAlumni() {
+            const tbody = document.getElementById('tbl-public-alumni');
+            const selectThn = document.getElementById('public-filter-lulus-thn');
+            if(!tbody || !selectThn) return;
+
+            const filterThn = selectThn.value;
+            tbody.innerHTML = '';
+            const keys = Object.keys(allAlumni);
+
+            const filtered = keys.filter(k => {
+                const a = allAlumni[k];
+                return filterThn === "" || (a.tahun_lulus || "") === filterThn;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400">Belum ada data rekap lulusan / alumni.</td></tr>';
+                return;
+            }
+
+            let no = 1;
+            filtered.forEach(k => {
+                const a = allAlumni[k];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-3 border text-center font-mono">${no++}</td>
+                        <td class="py-2 px-3 border font-mono">${a.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIS: ${a.nipd || '-'}</span></td>
+                        <td class="py-2 px-3 border font-bold text-gray-900">${a.nama || '-'}</td>
+                        <td class="py-2 px-3 border">${a.jk || '-'}</td>
+                        <td class="py-2 px-3 border font-bold text-indigo-900">${a.tahun_lulus || '-'}</td>
+                        <td class="py-2 px-3 border font-mono">${a.no_ijazah || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
 
         function renderPubGuru() {
             const tbody = document.getElementById('tbl-pub-guru');
