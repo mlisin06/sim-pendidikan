@@ -69,16 +69,21 @@
 
     <main class="container mx-auto px-4 py-6 flex-grow space-y-8">
 
-        <!-- PANEL IMPORT EXCEL -->
+        <!-- PANEL IMPORT EXCEL & TEMPLATE -->
         <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <div class="border-b pb-3 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div>
                     <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal (Aman Multi-Tahun & Multi-Semester)</h3>
-                    <p class="text-xs text-gray-500">Data antar tahun pelajaran & semester disimpan terpisah sehingga data lama tidak akan terhapus saat upload data periode baru.</p>
+                    <p class="text-xs text-gray-500">Unduh template Excel sesuai kategori untuk memudahkan pengisian data sebelum diunggah.</p>
                 </div>
-                <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-md text-xs whitespace-nowrap">
-                    <i class="fa-solid fa-download mr-1"></i> Download Template Excel
-                </button>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                        <i class="fa-solid fa-download mr-1"></i> Template Excel Siswa
+                    </button>
+                    <button onclick="downloadTemplateGuru()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                        <i class="fa-solid fa-download mr-1"></i> Template Excel Guru
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,7 +93,7 @@
                     <button onclick="uploadExcelDapodik()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-md text-xs">Proses Import / Gabung Data Siswa</button>
                 </div>
                 <div class="bg-green-50/60 p-4 rounded-lg border border-green-200 space-y-2">
-                    <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-upload text-green-700 mr-1"></i>Upload File Excel Guru</h4>
+                    <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-upload text-green-700 mr-1"></i>Upload File Excel Guru & PTK</h4>
                     <input type="file" id="excel-guru-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-700 file:text-white">
                     <button onclick="uploadExcelGuru()" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-md text-xs">Proses Import Data Guru</button>
                 </div>
@@ -157,7 +162,7 @@
                             <th class="p-2 border">JK</th>
                             <th class="p-2 border">Kelas</th>
                             <th class="p-2 border">Periode</th>
-                            <th class="p-2 border">Fisik (TB/BB/LK)</th>
+                            <th class="p-2 border">Tgl Lahir / Usia</th>
                             <th class="p-2 border text-center">Aksi Admin</th>
                         </tr>
                     </thead>
@@ -413,7 +418,17 @@
         let allSiswa = {};
         let allMutasi = {};
 
-        // Helper Unik Key untuk mencegah timpa data beda periode
+        function calculateAge(birthDateStr) {
+            if(!birthDateStr) return '-';
+            const birth = new Date(birthDateStr);
+            if(isNaN(birth.getTime())) return '-';
+            const now = new Date();
+            let age = now.getFullYear() - birth.getFullYear();
+            const m = now.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) { age--; }
+            return age >= 0 ? age + ' Th' : '-';
+        }
+
         function makeKey(nisn, tp, smt) {
             const cleanNisn = (nisn || '').toString().trim().replace(/[.#$/[\]]/g, '_');
             const cleanTp = (tp || '2025/2026').toString().trim().replace(/[\/\s.#$/[\]]/g, '-');
@@ -489,6 +504,7 @@
 
             filtered.forEach(k => {
                 const s = allSiswa[k];
+                const age = calculateAge(s.tgl_lahir);
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border text-center"><input type="checkbox" value="${k}" onchange="updateDeleteGroupButton()" class="chk-siswa rounded cursor-pointer"></td>
@@ -497,7 +513,7 @@
                         <td class="p-2 border">${s.jk || '-'}</td>
                         <td class="p-2 border font-bold text-blue-800">${s.rombel || s.kelas || '-'}</td>
                         <td class="p-2 border font-mono text-[11px]">${s.tahun_pelajaran || '2025/2026'}<br><span class="text-gray-400 text-[10px]">${s.semester || 'Ganjil'}</span></td>
-                        <td class="p-2 border">${s.tb || '-'}cm / ${s.bb || '-'}kg / ${s.lingkar_kepala || '-'}cm</td>
+                        <td class="p-2 border">${s.tgl_lahir || '-'}<br><span class="font-bold text-blue-900 text-[10px]">Usia: ${age}</span></td>
                         <td class="p-2 border text-center space-x-1">
                             <button onclick="showDetail('${k}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]">Detail</button>
                             <button onclick="openModalMutasiKeluar('${k}')" class="bg-rose-700 hover:bg-rose-800 text-white px-2 py-1 rounded text-[10px]">Mutasi</button>
@@ -795,6 +811,16 @@
             XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
         }
 
+        // TOMBOL BARU: DOWNLOAD TEMPLATE GURU & PTK
+        function downloadTemplateGuru() {
+            const headers = ["NIP", "Nama Guru", "JK", "Jabatan / Tugas", "Status Kepegawaian", "HP / No WA"];
+            const exampleRow = ["198507242010011001", "Nama Guru, S.Pd.", "L", "Guru Kelas 1", "PNS", "081234567890"];
+            const worksheet = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template Guru");
+            XLSX.writeFile(workbook, "Template_Guru_PTK_SDN03Limbangan.xlsx");
+        }
+
         // FUNGSI IMPORT EXCEL DENGAN UNIK KEY [NISN_TP_SEMESTER]
         function uploadExcelDapodik() {
             const fileInput = document.getElementById('excel-file');
@@ -941,7 +967,12 @@
                 let updateGuru = {};
                 json.forEach(row => {
                     const nip = row.nip || row.NIP || ('G_' + Date.now());
-                    updateGuru[nip] = { nip: nip.toString(), nama: row.nama || row.NAMA || 'Guru', jk: row.jk || 'L' };
+                    updateGuru[nip] = { 
+                        nip: nip.toString(), 
+                        nama: row.nama || row.NAMA || row['Nama Guru'] || 'Guru', 
+                        jk: row.jk || row.JK || 'L',
+                        jabatan: row.jabatan || row.JABATAN || row['Jabatan / Tugas'] || 'Guru'
+                    };
                 });
                 db.ref('guru').update(updateGuru);
                 alert('Data guru berhasil digabungkan!');
@@ -964,7 +995,7 @@
                             <p><b>NISN / NIPD:</b> ${s.nisn || '-'} / ${s.nipd || '-'}</p>
                             <p><b>NIK:</b> ${s.nik || '-'}</p>
                             <p><b>JK / Agama:</b> ${s.jk || '-'} / ${s.agama || '-'}</p>
-                            <p><b>TTL:</b> ${s.tempat_lahir || '-'}, ${s.tgl_lahir || '-'}</p>
+                            <p><b>TTL:</b> ${s.tempat_lahir || '-'}, ${s.tgl_lahir || '-'} (${calculateAge(s.tgl_lahir)})</p>
                             <p><b>Rombel / Kelas:</b> <span class="font-bold text-blue-800">${s.rombel || s.kelas || '-'}</span></p>
                         </div>
                     </div>
