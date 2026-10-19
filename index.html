@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIM SDN 03 Limbangan - Dashboard Analitik & Rekapitulasi</title>
-
+    
+    <!-- Favicon (Tab Web) -->
     <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="logo.jpg">
+
+    <!-- Meta Tags Preview WA (Open Graph) -->
     <meta property="og:title" content="SIM SDN 03 Limbangan - Dashboard Rekapitulasi & Statistik">
     <meta property="og:description" content="Portal transparansi data rekapitulasi siswa, guru, mutasi, dan statistik sekolah SDN 03 Limbangan.">
     <meta property="og:image" content="logo.jpg">
-    
+    <meta property="og:type" content="website">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -26,8 +31,8 @@
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="bg-white p-2 rounded-full text-blue-900">
-                    <i class="fa-solid fa-school text-xl"></i>
+                <div class="bg-white p-1 rounded-full w-10 h-10 flex items-center justify-center overflow-hidden shadow">
+                    <img src="logo.jpg" alt="Logo SDN 03 Limbangan" class="w-full h-full object-contain" onerror="this.src='https://i.ibb.co.com/nqrtff6Q/IMG-20261018-WA0000.jpg'">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">SDN 03 LIMBANGAN</h1>
@@ -37,7 +42,7 @@
             <nav class="flex space-x-3 text-xs font-semibold items-center">
                 <a href="index.html" class="bg-blue-800 text-white py-1 px-3 rounded">Dashboard Rekap</a>
                 <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 px-3 py-1 rounded font-bold transition">
-                    <i class="fa-solid fa-lock mr-1.5"></i> Panel Admin
+                    <i class="fa-solid fa-lock mr-1.5"></i> Panel Admin (PIN: 240785)
                 </a>
             </nav>
         </div>
@@ -49,13 +54,13 @@
         <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik</h2>
-                <p class="text-xs text-gray-500">Pilihan Tahun Pelajaran otomatis menyesuaikan data yang masuk ke database.</p>
+                <p class="text-xs text-gray-500">Pilihan Tahun Pelajaran otomatis menyesuaikan seluruh data yang tersimpan di database.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Tahun Pelajaran</label>
                     <select id="filter-tp" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
-                        <!-- Opsi akan terisi otomatis secara dinamis dari database -->
+                        <!-- Opsi terisi dinamis dari database -->
                     </select>
                 </div>
                 <div>
@@ -92,7 +97,7 @@
             <div class="bg-white p-4 rounded-xl shadow-sm border flex items-center space-x-3">
                 <div class="p-3 bg-green-100 text-green-700 rounded-lg text-xl"><i class="fa-solid fa-chalkboard-user"></i></div>
                 <div>
-                    <span class="text-[11px] text-gray-500 block">Guru & Tendik</span>
+                    <span class="text-[11px] text-gray-500 block">Guru & Tendik (PTK)</span>
                     <span id="stat-guru" class="text-xl font-extrabold text-green-900">0</span>
                 </div>
             </div>
@@ -143,26 +148,26 @@
             </div>
         </div>
 
-        <!-- DAFTAR SISWA SESUAI FILTER -->
+        <!-- TABEL DAFTAR GURU & TENDIK (PTK) -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
-                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
-                <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                    <h3 class="font-bold text-sm text-green-900"><i class="fa-solid fa-chalkboard-user text-green-700 mr-2"></i>Daftar Guru & Tenaga Kependidikan (PTK)</h3>
+                    <p class="text-[11px] text-gray-500">Pendidik dan Tenaga Kependidikan SDN 03 Limbangan.</p>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
-                            <th class="py-2.5 px-3 border">NISN</th>
-                            <th class="py-2.5 px-3 border">Nama Lengkap</th>
-                            <th class="py-2.5 px-3 border">JK</th>
-                            <th class="py-2.5 px-3 border">Kelas</th>
-                            <th class="py-2.5 px-3 border">Fisik (TB / BB / LK)</th>
-                            <th class="py-2.5 px-3 border text-center">Aksi</th>
+                            <th class="py-2 px-3 border">NIP / NUPTK</th>
+                            <th class="py-2 px-3 border">Nama Lengkap Guru</th>
+                            <th class="py-2 px-3 border">JK</th>
+                            <th class="py-2 px-3 border">Jabatan / Tugas</th>
                         </tr>
                     </thead>
-                    <tbody id="tbl-daftar-siswa-rekap" class="divide-y text-xs">
-                        <tr><td colspan="6" class="text-center py-6 text-gray-400">Memuat data siswa...</td></tr>
+                    <tbody id="tbl-pub-guru" class="divide-y text-xs">
+                        <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data guru.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -209,9 +214,34 @@
             </div>
         </div>
 
+        <!-- DAFTAR SISWA SESUAI FILTER (POSISI DI PALING BAWAH) -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
+                <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
+                <input type="text" id="search-siswa-rekap" placeholder="Cari Nama / NISN..." class="px-3 py-1.5 border rounded text-xs w-full md:w-64">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="py-2.5 px-3 border">NISN</th>
+                            <th class="py-2.5 px-3 border">Nama Lengkap</th>
+                            <th class="py-2.5 px-3 border">JK</th>
+                            <th class="py-2.5 px-3 border">Kelas</th>
+                            <th class="py-2.5 px-3 border">Fisik (TB / BB / LK)</th>
+                            <th class="py-2.5 px-3 border text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-daftar-siswa-rekap" class="divide-y text-xs">
+                        <tr><td colspan="6" class="text-center py-6 text-gray-400">Memuat data siswa...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 
-    <!-- Modal Detail Lengkap Siswa (Seluruh Kolom Dapodik) -->
+    <!-- Modal Detail Lengkap Siswa (Seluruh 68 Atribut Dapodik Lengkap) -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -247,6 +277,7 @@
         const db = firebase.database();
 
         let allSiswa = {};
+        let allGuru = {};
         let allMutasi = {};
         let chartPIPInstance = null;
         let chartJKInstance = null;
@@ -277,7 +308,8 @@
         });
 
         db.ref('guru').on('value', snapshot => {
-            document.getElementById('stat-guru').innerText = Object.keys(snapshot.val() || {}).length;
+            allGuru = snapshot.val() || {};
+            renderPubGuru();
         });
 
         db.ref('mutasi').on('value', snapshot => {
@@ -285,10 +317,33 @@
             renderPubMutasi();
         });
 
-        // Fungsi Dinamis Mengambil Tahun Pelajaran dari Data Siswa yang Masuk
+        function renderPubGuru() {
+            const tbody = document.getElementById('tbl-pub-guru');
+            tbody.innerHTML = '';
+            const keys = Object.keys(allGuru);
+            document.getElementById('stat-guru').innerText = keys.length;
+
+            if(keys.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data guru.</td></tr>';
+                return;
+            }
+
+            keys.forEach(k => {
+                const g = allGuru[k];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-3 border font-mono">${g.nip || '-'}</td>
+                        <td class="py-2 px-3 border font-bold text-gray-900">${g.nama || '-'}</td>
+                        <td class="py-2 px-3 border">${g.jk || '-'}</td>
+                        <td class="py-2 px-3 border font-semibold text-green-800">${g.jabatan || g.tugas || 'Guru / PTK'}</td>
+                    </tr>
+                `;
+            });
+        }
+
         function updateTahunPelajaranDropdown() {
             const selectTP = document.getElementById('filter-tp');
-            const currentSelected = selectTP.value; // Simpan pilihan aktif saat ini
+            const currentSelected = selectTP.value;
             
             let tpSet = new Set();
             Object.values(allSiswa).forEach(s => {
@@ -297,12 +352,10 @@
                 }
             });
 
-            // Jika belum ada data sama sekali di database, sediakan default
             if(tpSet.size === 0) {
                 tpSet.add("2025/2026");
             }
 
-            // Urutkan tahun secara menurun/terbaru
             const sortedTP = Array.from(tpSet).sort().reverse();
 
             selectTP.innerHTML = '';
@@ -316,7 +369,6 @@
                 selectTP.appendChild(opt);
             });
 
-            // Jika pilihan sebelumnya tidak ada di list baru, pilih yang pertama
             if(!tpSet.has(currentSelected) && sortedTP.length > 0) {
                 selectTP.value = sortedTP[0];
             }
@@ -455,71 +507,78 @@
 
         document.getElementById('search-siswa-rekap').addEventListener('input', updateDashboard);
 
+        // FUNGSI SHOW DETAIL LENGKAP SEMUA SELURUH ATRIBUT DAPODIK
         function showDetail(key) {
             const s = allSiswa[key];
             if(!s) return;
             document.getElementById('m-title').innerText = `Detail Lengkap Dapodik: ${s.nama || ''} (NISN: ${s.nisn || '-'})`;
             let html = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- 1. Identitas & Akademik -->
                     <div class="bg-blue-50/70 p-3.5 rounded-lg border border-blue-200">
                         <h5 class="font-bold text-blue-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-id-card mr-1"></i> 1. Identitas & Akademik</h5>
                         <div class="space-y-1">
-                            <p><b>Tahun Pelajaran / Smt:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
+                            <p><b>Tahun Pelajaran / Semester:</b> ${s.tahun_pelajaran || '2025/2026'} - ${s.semester || 'Ganjil'}</p>
                             <p><b>Nama Lengkap:</b> ${s.nama || '-'}</p>
                             <p><b>NISN / NIPD:</b> ${s.nisn || '-'} / ${s.nipd || '-'}</p>
-                            <p><b>NIK:</b> ${s.nik || '-'}</p>
+                            <p><b>NIK Siswa:</b> ${s.nik || '-'}</p>
+                            <p><b>No KK:</b> ${s.no_kk || '-'}</p>
                             <p><b>JK / Agama:</b> ${s.jk || '-'} / ${s.agama || '-'}</p>
                             <p><b>TTL:</b> ${s.tempat_lahir || '-'}, ${s.tgl_lahir || '-'}</p>
                             <p><b>Rombel / Kelas:</b> <span class="font-bold text-blue-800">${s.rombel || s.kelas || '-'}</span></p>
-                            <p><b>No Akta Lahir:</b> ${s.akta || '-'}</p>
+                            <p><b>No Reg Akta Lahir:</b> ${s.akta || '-'}</p>
                             <p><b>Sekolah Asal:</b> ${s.sekolah_asal || '-'}</p>
+                            <p><b>SKHUN / No Peserta UN:</b> ${s.skhun || '-'} / ${s.no_un || '-'}</p>
+                            <p><b>No Seri Ijazah:</b> ${s.no_ijazah || '-'}</p>
                         </div>
                     </div>
 
-                    <!-- 2. Fisik & Tambahan -->
                     <div class="bg-purple-50/70 p-3.5 rounded-lg border border-purple-200">
-                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Fisik & Tambahan</h5>
+                        <h5 class="font-bold text-purple-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Fisik & Informasi Tambahan</h5>
                         <div class="space-y-1">
                             <p><b>Tinggi Badan:</b> <span class="font-bold text-purple-900">${s.tb || '-'} cm</span></p>
                             <p><b>Berat Badan:</b> <span class="font-bold text-purple-900">${s.bb || '-'} kg</span></p>
                             <p><b>Lingkar Kepala:</b> <span class="font-bold text-purple-900">${s.lingkar_kepala || '-'} cm</span></p>
-                            <p><b>Anak Ke- / Jumlah Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
+                            <p><b>Anak Ke- / Jml Saudara:</b> ${s.anak_ke || '-'} dari ${s.jml_saudara || '-'} bersaudara</p>
                             <p><b>Kebutuhan Khusus:</b> ${s.kebutuhan_khusus || '-'}</p>
-                            <p><b>Jenis Tinggal / Transportasi:</b> ${s.jenis_tinggal || '-'} / ${s.transportasi || '-'}</p>
+                            <p><b>Jenis Tinggal:</b> ${s.jenis_tinggal || '-'}</p>
+                            <p><b>Alat Transportasi:</b> ${s.transportasi || '-'}</p>
+                            <p><b>Jarak ke Sekolah:</b> ${s.jarak_sekolah || '-'} KM</p>
+                            <p><b>Koordinat (Lintang/Bujur):</b> ${s.lintang || '-'} / ${s.bujur || '-'}</p>
                         </div>
                     </div>
 
-                    <!-- 3. Alamat & Kontak -->
                     <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-200">
-                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat & Kontak</h5>
+                        <h5 class="font-bold text-gray-800 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat Lengkap & Kontak</h5>
                         <div class="space-y-1">
-                            <p><b>Alamat / Dusun:</b> ${s.alamat || '-'} / ${s.dusun || '-'}</p>
+                            <p><b>Alamat Jalan:</b> ${s.alamat || '-'}</p>
                             <p><b>RT / RW:</b> RT ${s.rt || '-'}/ RW ${s.rw || '-'}</p>
-                            <p><b>Kelurahan / Desa:</b> ${s.kelurahan || '-'}</p>
-                            <p><b>Kecamatan / Kode Pos:</b> ${s.kecamatan || '-'} (${s.kode_pos || '-'})</p>
-                            <p><b>No HP / Email:</b> ${s.hp || s.telepon || '-'} / ${s.email || '-'}</p>
+                            <p><b>Dusun / Desa:</b> ${s.dusun || '-'} / ${s.kelurahan || '-'}</p>
+                            <p><b>Kecamatan / Kode Pos:</b> ${s.kecamatan || '-'} (${s.kode_pos || '-'}</p>
+                            <p><b>Telepon / HP:</b> ${s.telepon || '-'} / ${s.hp || '-'}</p>
+                            <p><b>E-Mail:</b> ${s.email || '-'}</p>
                         </div>
                     </div>
 
-                    <!-- 4. Data Orang Tua -->
                     <div class="bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
-                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua</h5>
+                        <h5 class="font-bold text-amber-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua & Wali</h5>
                         <div class="space-y-1">
-                            <p><b>Ayah:</b> ${s.nama_ayah || '-'} (NIK: ${s.nik_ayah || '-'})</p>
-                            <p><b>Pekerjaan Ayah:</b> ${s.kerja_ayah || '-'}</p>
-                            <p><b>Ibu:</b> ${s.nama_ibu || s.ibu || '-'} (NIK: ${s.nik_ibu || '-'})</p>
-                            <p><b>Pekerjaan Ibu:</b> ${s.kerja_ibu || '-'}</p>
-                            <p><b>Wali:</b> ${s.nama_wali || '-'}</p>
+                            <p><b>Ayah:</b> ${s.nama_ayah || '-'} (NIK: ${s.nik_ayah || '-'}, Thn: ${s.thn_ayah || '-'})</p>
+                            <p><b>Pekerjaan / Pend. Ayah:</b> ${s.kerja_ayah || '-'} / ${s.pend_ayah || '-'}</p>
+                            <p><b>Penghasilan Ayah:</b> ${s.hasil_ayah || '-'}</p>
+                            <p class="pt-1 border-t"><b>Ibu:</b> ${s.nama_ibu || s.ibu || '-'} (NIK: ${s.nik_ibu || '-'}, Thn: ${s.thn_ibu || '-'})</p>
+                            <p><b>Pekerjaan / Pend. Ibu:</b> ${s.kerja_ibu || '-'} / ${s.pend_ibu || '-'}</p>
+                            <p><b>Penghasilan Ibu:</b> ${s.hasil_ibu || '-'}</p>
+                            <p class="pt-1 border-t"><b>Wali:</b> ${s.nama_wali || '-'} (NIK: ${s.nik_wali || '-'})</p>
                         </div>
                     </div>
 
-                    <!-- 5. Bantuan PIP & Rekening -->
                     <div class="bg-emerald-50/70 p-3.5 rounded-lg border border-emerald-200 md:col-span-2">
-                        <h5 class="font-bold text-emerald-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Bantuan PIP / KIP & Rekening Bank</h5>
+                        <h5 class="font-bold text-emerald-900 border-b pb-1 mb-2 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Program Bantuan & Rekening Bank</h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <p><b>Layak PIP (Usulan):</b> ${s.layak_pip || '-'}</p>
-                            <p><b>Penerima KIP / No KIP:</b> ${s.penerima_kip || '-'} / ${s.no_kip || '-'}</p>
+                            <p><b>Layak PIP (Usulan):</b> ${s.layak_pip || '-'} (${s.alasan_pip || 'Tanpa Alasan'})</p>
+                            <p><b>Penerima KPS / No KPS:</b> ${s.penerima_kps || '-'} / ${s.no_kps || '-'}</p>
+                            <p><b>Penerima KIP / No KIP:</b> ${s.penerima_kip || '-'} / ${s.no_kip || '-'} (a.n: ${s.nama_kip || '-'})</p>
+                            <p><b>Nomor KKS:</b> ${s.no_kks || '-'}</p>
                             <p><b>Bank Rekening:</b> ${s.bank || '-'}</p>
                             <p><b>Nomor Rekening / A.N:</b> ${s.norek || '-'} a.n ${s.an_bank || '-'}</p>
                         </div>
