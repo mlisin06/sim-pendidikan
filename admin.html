@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - SDN 03 Limbangan</title>
+
     <!-- Favicon (Tab Web) -->
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="shortcut icon" type="image/jpeg" href="logo.jpg">
@@ -56,11 +57,11 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">PANEL ADMIN & KELOLA DATA</h1>
-                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola, Edit, Mutasi & Import Safe Data</p>
+                    <p class="text-xs text-gray-400">SDN 03 Limbangan • Kelola Siswa, Guru & PTK, Mutasi</p>
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold">
-                <a href="index.html" class="bg-blue-700 hover:bg-blue-800 text-white py-1.5 px-3 rounded">
+                <a href="index.html" class="bg-blue-700 hover:bg-blue-800 text-white py-1.5 px-3 rounded shadow">
                     <i class="fa-solid fa-chart-pie mr-1"></i> Kembali Ke Dashboard Rekap
                 </a>
             </nav>
@@ -77,11 +78,11 @@
                     <p class="text-xs text-gray-500">Unduh template Excel sesuai kategori untuk memudahkan pengisian data sebelum diunggah.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                    <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
                         <i class="fa-solid fa-download mr-1"></i> Template Excel Siswa
                     </button>
-                    <button onclick="downloadTemplateGuru()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
-                        <i class="fa-solid fa-download mr-1"></i> Template Excel Guru
+                    <button onclick="downloadTemplateGuru()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
+                        <i class="fa-solid fa-download mr-1"></i> Template Excel Guru (TTL, NIK, TMT)
                     </button>
                 </div>
             </div>
@@ -90,12 +91,12 @@
                 <div class="bg-blue-50/60 p-4 rounded-lg border border-blue-200 space-y-2">
                     <h4 class="font-bold text-blue-900 text-xs"><i class="fa-solid fa-upload text-blue-700 mr-1"></i>Upload File Excel Siswa</h4>
                     <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-700 file:text-white">
-                    <button onclick="uploadExcelDapodik()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-md text-xs">Proses Import / Gabung Data Siswa</button>
+                    <button onclick="uploadExcelDapodik()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-md text-xs shadow">Proses Import / Gabung Data Siswa</button>
                 </div>
                 <div class="bg-green-50/60 p-4 rounded-lg border border-green-200 space-y-2">
                     <h4 class="font-bold text-green-900 text-xs"><i class="fa-solid fa-upload text-green-700 mr-1"></i>Upload File Excel Guru & PTK</h4>
                     <input type="file" id="excel-guru-file" accept=".xlsx, .xls, .csv" class="block w-full text-xs text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-700 file:text-white">
-                    <button onclick="uploadExcelGuru()" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-md text-xs">Proses Import Data Guru</button>
+                    <button onclick="uploadExcelGuru()" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-md text-xs shadow">Proses Import Data Guru & PTK</button>
                 </div>
             </div>
         </section>
@@ -109,12 +110,12 @@
                         <i class="fa-solid fa-trash-can mr-1"></i> Hapus Terpilih (<span id="selected-count">0</span>)
                     </button>
                 </div>
-                <button onclick="openFormTambah()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                <button onclick="openFormTambah()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
                     <i class="fa-solid fa-plus mr-1"></i> Tambah Siswa Baru
                 </button>
             </div>
 
-            <!-- PANEL FILTER KELOLA DIREKTORI -->
+            <!-- PANEL FILTER KELOLA DIREKTORI SISWA -->
             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-3">
                     <div>
@@ -171,6 +172,61 @@
             </div>
         </section>
 
+        <!-- KELOLA DIREKTORI GURU & PTK -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-emerald-900"><i class="fa-solid fa-chalkboard-user text-emerald-700 mr-2"></i>Kelola Data Guru & Tenaga Kependidikan (PTK)</h3>
+                    <p class="text-xs text-gray-500">Lengkapi data NIP, NIK, Tempat & Tgl Lahir (TTL), serta TMT Kepegawaian terfilter per Periode.</p>
+                </div>
+                <button onclick="openFormGuruTambah()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
+                    <i class="fa-solid fa-plus mr-1"></i> Tambah Guru Baru
+                </button>
+            </div>
+
+            <!-- PANEL FILTER GURU -->
+            <div class="bg-emerald-50/50 p-3 rounded-lg border border-emerald-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Tahun Pelajaran Guru</label>
+                        <select id="admin-filter-guru-tp" onchange="renderTableGuruAdmin()" class="px-2.5 py-1 border rounded text-xs font-semibold bg-white focus:ring-1 focus:ring-emerald-500">
+                            <option value="">Semua Tahun</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Semester</label>
+                        <select id="admin-filter-guru-smt" onchange="renderTableGuruAdmin()" class="px-2.5 py-1 border rounded text-xs font-semibold bg-white focus:ring-1 focus:ring-emerald-500">
+                            <option value="">Semua Smt</option>
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="w-full md:w-64">
+                    <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Pencarian Guru</label>
+                    <input type="text" id="search-guru-admin" oninput="renderTableGuruAdmin()" placeholder="Cari NIP / NIK / Nama..." class="px-3 py-1 border rounded text-xs w-full bg-white">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
+                            <th class="p-2 border">NIP / NIK</th>
+                            <th class="p-2 border">Nama Guru & Gelar</th>
+                            <th class="p-2 border">JK</th>
+                            <th class="p-2 border">TTL (Tempat, Tgl Lahir)</th>
+                            <th class="p-2 border">TMT Kepegawaian</th>
+                            <th class="p-2 border">Jabatan / Status</th>
+                            <th class="p-2 border">Periode</th>
+                            <th class="p-2 border text-center">Aksi Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-admin-guru" class="divide-y text-xs"></tbody>
+                </table>
+            </div>
+        </section>
+
         <!-- KELOLA MUTASI SISWA (MASUK & KELUAR) -->
         <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b pb-3">
@@ -178,7 +234,7 @@
                     <h3 class="text-base font-bold text-gray-800"><i class="fa-solid fa-arrows-rotate text-blue-700 mr-2"></i>Kelola Mutasi Siswa (Masuk & Keluar)</h3>
                     <p class="text-xs text-gray-500">Catat pendaftaran siswa baru pindahan (Mutasi Masuk) atau kelola siswa yang keluar.</p>
                 </div>
-                <button onclick="openModalMutasiMasuk()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                <button onclick="openModalMutasiMasuk()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
                     <i class="fa-solid fa-plus mr-1"></i> Tambah Mutasi Masuk
                 </button>
             </div>
@@ -202,6 +258,55 @@
         </section>
 
     </main>
+
+    <!-- MODAL FORM EDIT / TAMBAH GURU -->
+    <div id="modal-form-guru" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="bg-emerald-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm" id="form-guru-title">Tambah / Edit Data Guru</h4>
+                <button onclick="closeFormGuruModal()" class="text-white hover:text-emerald-200 font-bold text-lg">&times;</button>
+            </div>
+            
+            <form id="form-guru" onsubmit="handleSaveGuru(event)" class="p-6 overflow-y-auto text-xs space-y-4">
+                <input type="hidden" id="fg-record-key">
+                <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200 flex flex-wrap items-center gap-4">
+                    <span class="font-bold text-emerald-900"><i class="fa-solid fa-calendar mr-1"></i> Periode Akademik:</span>
+                    <div>
+                        <label class="font-semibold text-gray-700">Tahun Pelajaran:</label>
+                        <input type="text" id="fg-tp" placeholder="Contoh: 2025/2026" required class="p-1 border rounded font-semibold ml-1 w-28">
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700">Semester:</label>
+                        <select id="fg-smt" class="p-1 border rounded font-semibold ml-1">
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label class="block font-semibold mb-1">NIP / NUPTK *</label><input type="text" id="fg-nip" required class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">NIK Guru *</label><input type="text" id="fg-nik" required class="w-full p-2 border rounded"></div>
+                    <div class="md:col-span-2"><label class="block font-semibold mb-1">Nama Lengkap & Gelar *</label><input type="text" id="fg-nama" required class="w-full p-2 border rounded"></div>
+                    <div>
+                        <label class="block font-semibold mb-1">Jenis Kelamin</label>
+                        <select id="fg-jk" class="w-full p-2 border rounded"><option value="L">Laki-laki (L)</option><option value="P">Perempuan (P)</option></select>
+                    </div>
+                    <div><label class="block font-semibold mb-1">HP / WhatsApp</label><input type="text" id="fg-hp" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Tempat Lahir</label><input type="text" id="fg-tempat-lahir" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Tanggal Lahir</label><input type="date" id="fg-tgl-lahir" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">TMT Kepegawaian (Tgl Mulai Tugas)</label><input type="date" id="fg-tmt" class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Jabatan / Tugas Mengajar</label><input type="text" id="fg-jabatan" placeholder="Contoh: Guru Kelas 1 / Kepala Sekolah" class="w-full p-2 border rounded"></div>
+                    <div class="md:col-span-2"><label class="block font-semibold mb-1">Status Kepegawaian</label><input type="text" id="fg-status-peg" placeholder="PNS / PPPK / GTT / PTT" class="w-full p-2 border rounded"></div>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeFormGuruModal()" class="bg-gray-400 text-white font-semibold px-4 py-2 rounded text-xs">Batal</button>
+                    <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Data Guru</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL MUTASI KELUAR -->
     <div id="modal-mutasi-keluar" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -384,6 +489,12 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-4 text-center text-xs mt-8">
+        <p>&copy; 2026 SDN 03 Limbangan. All Rights Reserved.</p>
+        <p class="text-gray-500 mt-0.5">Created By Muhlisin</p>
+    </footer>
+
     <script>
         function verifyPin(e) {
             e.preventDefault();
@@ -416,6 +527,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let allSiswa = {};
+        let allGuru = {};
         let allMutasi = {};
 
         function calculateAge(birthDateStr) {
@@ -442,6 +554,12 @@
             renderTableAdmin();
         });
 
+        db.ref('guru').on('value', snapshot => {
+            allGuru = snapshot.val() || {};
+            updateAdminGuruTahunDropdown();
+            renderTableGuruAdmin();
+        });
+
         db.ref('mutasi').on('value', snapshot => {
             allMutasi = snapshot.val() || {};
             renderTableMutasi();
@@ -450,12 +568,28 @@
         function updateAdminTahunDropdown() {
             const selectTP = document.getElementById('admin-filter-tp');
             const currentSelected = selectTP.value;
-            
             let tpSet = new Set();
             Object.values(allSiswa).forEach(s => {
-                if(s.tahun_pelajaran) {
-                    tpSet.add(s.tahun_pelajaran.trim());
-                }
+                if(s.tahun_pelajaran) tpSet.add(s.tahun_pelajaran.trim());
+            });
+
+            const sortedTP = Array.from(tpSet).sort().reverse();
+            selectTP.innerHTML = '<option value="">Semua Tahun</option>';
+            sortedTP.forEach(tp => {
+                const opt = document.createElement('option');
+                opt.value = tp;
+                opt.innerText = tp;
+                if(tp === currentSelected) opt.selected = true;
+                selectTP.appendChild(opt);
+            });
+        }
+
+        function updateAdminGuruTahunDropdown() {
+            const selectTP = document.getElementById('admin-filter-guru-tp');
+            const currentSelected = selectTP.value;
+            let tpSet = new Set();
+            Object.values(allGuru).forEach(g => {
+                if(g.tahun_pelajaran) tpSet.add(g.tahun_pelajaran.trim());
             });
 
             const sortedTP = Array.from(tpSet).sort().reverse();
@@ -527,6 +661,119 @@
         }
 
         document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
+
+        function renderTableGuruAdmin() {
+            const tbody = document.getElementById('tbl-admin-guru');
+            const search = document.getElementById('search-guru-admin').value.toLowerCase();
+            const filterTP = document.getElementById('admin-filter-guru-tp').value;
+            const filterSMT = document.getElementById('admin-filter-guru-smt').value;
+
+            tbody.innerHTML = '';
+            const keys = Object.keys(allGuru);
+
+            const filtered = keys.filter(k => {
+                const g = allGuru[k];
+                const matchTP = filterTP === "" || (g.tahun_pelajaran || "2025/2026") === filterTP;
+                const matchSMT = filterSMT === "" || (g.semester || "Ganjil") === filterSMT;
+                const matchSearch = (g.nama || '').toLowerCase().includes(search) || 
+                                    (g.nip || '').toString().includes(search) || 
+                                    (g.nik || '').toString().includes(search);
+                return matchTP && matchSMT && matchSearch;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-gray-400">Tidak ada data guru yang cocok dengan filter.</td></tr>';
+                return;
+            }
+
+            filtered.forEach(k => {
+                const g = allGuru[k];
+                const ttl = (g.tempat_lahir || g.tgl_lahir) ? `${g.tempat_lahir || '-'}, ${g.tgl_lahir || '-'}` : '-';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border font-mono">${g.nip || '-'}<br><span class="text-[10px] text-gray-500">NIK: ${g.nik || '-'}</span></td>
+                        <td class="p-2 border font-bold text-gray-900">${g.nama || '-'}<br><span class="text-[10px] text-emerald-800 font-semibold">HP: ${g.hp || '-'}</span></td>
+                        <td class="p-2 border">${g.jk || '-'}</td>
+                        <td class="p-2 border">${ttl}</td>
+                        <td class="p-2 border font-mono">${g.tmt || '-'}</td>
+                        <td class="p-2 border font-semibold text-emerald-900">${g.jabatan || 'Guru'}<br><span class="text-[10px] text-gray-500">${g.status_peg || '-'}</span></td>
+                        <td class="p-2 border font-mono text-[11px]">${g.tahun_pelajaran || '2025/2026'}<br><span class="text-gray-400 text-[10px]">${g.semester || 'Ganjil'}</span></td>
+                        <td class="p-2 border text-center space-x-1">
+                            <button onclick="openFormGuruEdit('${k}')" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold px-2 py-1 rounded text-[10px]">Edit</button>
+                            <button onclick="deleteSingleGuru('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openFormGuruTambah() {
+            document.getElementById('form-guru').reset();
+            document.getElementById('fg-record-key').value = '';
+            document.getElementById('fg-nip').readOnly = false;
+            document.getElementById('fg-tp').value = "2025/2026";
+            document.getElementById('form-guru-title').innerText = "Tambah Data Guru / PTK Baru";
+            document.getElementById('modal-form-guru').classList.remove('hidden');
+        }
+
+        function openFormGuruEdit(key) {
+            const g = allGuru[key];
+            if(!g) return;
+            document.getElementById('form-guru-title').innerText = `Edit Data Guru: ${g.nama || ''}`;
+            document.getElementById('fg-record-key').value = key;
+
+            document.getElementById('fg-tp').value = g.tahun_pelajaran || '2025/2026';
+            document.getElementById('fg-smt').value = g.semester || 'Ganjil';
+            document.getElementById('fg-nip').value = g.nip || '';
+            document.getElementById('fg-nip').readOnly = true;
+            document.getElementById('fg-nik').value = g.nik || '';
+            document.getElementById('fg-nama').value = g.nama || '';
+            document.getElementById('fg-jk').value = g.jk || 'L';
+            document.getElementById('fg-hp').value = g.hp || '';
+            document.getElementById('fg-tempat-lahir').value = g.tempat_lahir || '';
+            document.getElementById('fg-tgl-lahir').value = g.tgl_lahir || '';
+            document.getElementById('fg-tmt').value = g.tmt || '';
+            document.getElementById('fg-jabatan').value = g.jabatan || '';
+            document.getElementById('fg-status-peg').value = g.status_peg || '';
+
+            document.getElementById('modal-form-guru').classList.remove('hidden');
+        }
+
+        function closeFormGuruModal() { document.getElementById('modal-form-guru').classList.add('hidden'); }
+
+        function handleSaveGuru(e) {
+            e.preventDefault();
+            const nip = document.getElementById('fg-nip').value;
+            const tp = document.getElementById('fg-tp').value;
+            const smt = document.getElementById('fg-smt').value;
+            const recordKey = document.getElementById('fg-record-key').value || makeKey(nip, tp, smt);
+            const existing = allGuru[recordKey] || {};
+
+            const updatedGuru = {
+                ...existing,
+                nip: nip,
+                nik: document.getElementById('fg-nik').value,
+                nama: document.getElementById('fg-nama').value,
+                jk: document.getElementById('fg-jk').value,
+                hp: document.getElementById('fg-hp').value,
+                tempat_lahir: document.getElementById('fg-tempat-lahir').value,
+                tgl_lahir: document.getElementById('fg-tgl-lahir').value,
+                tmt: document.getElementById('fg-tmt').value,
+                jabatan: document.getElementById('fg-jabatan').value,
+                status_peg: document.getElementById('fg-status-peg').value,
+                tahun_pelajaran: tp,
+                semester: smt
+            };
+
+            db.ref('guru/' + recordKey).set(updatedGuru, err => {
+                if(!err) { alert('Data guru berhasil disimpan!'); closeFormGuruModal(); }
+                else alert('Gagal menyimpan guru: ' + err.message);
+            });
+        }
+
+        function deleteSingleGuru(key) {
+            if(confirm('Yakin hapus data guru ini?')) db.ref('guru/' + key).remove();
+        }
 
         function toggleSelectAll(master) {
             document.querySelectorAll('.chk-siswa').forEach(cb => cb.checked = master.checked);
@@ -811,17 +1058,15 @@
             XLSX.writeFile(workbook, "Template_Dapodik_SDN03Limbangan.xlsx");
         }
 
-        // TOMBOL BARU: DOWNLOAD TEMPLATE GURU & PTK
         function downloadTemplateGuru() {
-            const headers = ["NIP", "Nama Guru", "JK", "Jabatan / Tugas", "Status Kepegawaian", "HP / No WA"];
-            const exampleRow = ["198507242010011001", "Nama Guru, S.Pd.", "L", "Guru Kelas 1", "PNS", "081234567890"];
+            const headers = ["Tahun Pelajaran", "Semester", "NIP", "NIK", "Nama Guru", "JK", "Tempat Lahir", "Tanggal Lahir", "TMT", "Jabatan / Tugas", "Status Kepegawaian", "HP / No WA"];
+            const exampleRow = ["2025/2026", "Ganjil", "198507242010011001", "3327012407850001", "Nama Guru, S.Pd.", "L", "Pemalang", "1985-07-24", "2010-01-01", "Guru Kelas 1", "PNS", "081234567890"];
             const worksheet = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Template Guru");
             XLSX.writeFile(workbook, "Template_Guru_PTK_SDN03Limbangan.xlsx");
         }
 
-        // FUNGSI IMPORT EXCEL DENGAN UNIK KEY [NISN_TP_SEMESTER]
         function uploadExcelDapodik() {
             const fileInput = document.getElementById('excel-file');
             if(!fileInput.files.length) return alert('Pilih file Excel terlebih dahulu!');
@@ -963,20 +1208,74 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const workbook = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, defval: ""});
+                if(rows.length === 0) return alert('File Excel Guru kosong!');
+
+                let headerIdx = -1;
+                for(let i=0; i<Math.min(rows.length, 10); i++) {
+                    const rowStr = rows[i].join(" ").toLowerCase();
+                    if(rowStr.includes("nama") || rowStr.includes("nip") || rowStr.includes("nik")) {
+                        headerIdx = i; break;
+                    }
+                }
+                if(headerIdx === -1) headerIdx = 0;
+                const headers = rows[headerIdx].map(h => h.toString().trim());
                 let updateGuru = {};
-                json.forEach(row => {
-                    const nip = row.nip || row.NIP || ('G_' + Date.now());
-                    updateGuru[nip] = { 
-                        nip: nip.toString(), 
-                        nama: row.nama || row.NAMA || row['Nama Guru'] || 'Guru', 
-                        jk: row.jk || row.JK || 'L',
-                        jabatan: row.jabatan || row.JABATAN || row['Jabatan / Tugas'] || 'Guru'
+                let count = 0;
+
+                for(let i = headerIdx + 1; i < rows.length; i++) {
+                    const rowData = rows[i];
+                    if(!rowData || rowData.length === 0) continue;
+
+                    const getVal = (possibleKeys) => {
+                        for(let pKey of possibleKeys) {
+                            for(let hIdx=0; hIdx<headers.length; hIdx++) {
+                                if(headers[hIdx].toLowerCase() === pKey.toLowerCase()) {
+                                    return rowData[hIdx] !== undefined ? rowData[hIdx] : "";
+                                }
+                            }
+                        }
+                        return "";
                     };
+
+                    const nipVal = getVal(['nip', 'NIP', 'nuptk', 'NUPTK']);
+                    const nama = getVal(['nama', 'Nama', 'nama guru', 'Nama Guru']);
+                    if(!nipVal && !nama) continue;
+
+                    const nip = (nipVal || ('G_' + Date.now() + Math.random().toString().substr(2,3))).toString().trim();
+                    const tp = (getVal(['tahun pelajaran', 'tahun ajaran', 'tp']) || "2025/2026").toString().trim();
+                    const smt = (getVal(['semester', 'smt']) || "Ganjil").toString().trim();
+
+                    const recordKey = makeKey(nip, tp, smt);
+                    const currentExist = allGuru[recordKey] || {};
+
+                    updateGuru[recordKey] = {
+                        ...currentExist,
+                        nip: nip,
+                        nik: getVal(['nik', 'NIK']) || currentExist.nik || "",
+                        nama: nama || currentExist.nama || "Guru",
+                        jk: getVal(['jk', 'JK']) || currentExist.jk || "L",
+                        tempat_lahir: getVal(['tempat lahir', 'Tempat Lahir']) || currentExist.tempat_lahir || "",
+                        tgl_lahir: getVal(['tanggal lahir', 'Tanggal Lahir']) || currentExist.tgl_lahir || "",
+                        tmt: getVal(['tmt', 'TMT']) || currentExist.tmt || "",
+                        jabatan: getVal(['jabatan', 'Jabatan', 'jabatan / tugas', 'Jabatan / Tugas']) || currentExist.jabatan || "Guru",
+                        status_peg: getVal(['status kepegawaian', 'Status Kepegawaian']) || currentExist.status_peg || "PNS/PPPK",
+                        hp: getVal(['hp / no wa', 'hp', 'HP', 'telepon']) || currentExist.hp || "",
+                        tahun_pelajaran: tp,
+                        semester: smt
+                    };
+                    count++;
+                }
+
+                db.ref('guru').update(updateGuru, (err) => {
+                    if(!err) {
+                        alert(`Berhasil! ${count} data guru/PTK berhasil diimpor/digabungkan.`);
+                        fileInput.value = '';
+                    } else {
+                        alert('Gagal import data guru: ' + err.message);
+                    }
                 });
-                db.ref('guru').update(updateGuru);
-                alert('Data guru berhasil digabungkan!');
-                fileInput.value = '';
             };
             reader.readAsArrayBuffer(fileInput.files[0]);
         }
