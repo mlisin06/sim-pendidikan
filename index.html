@@ -40,8 +40,8 @@
                 </div>
             </div>
             <nav class="flex space-x-3 text-xs font-semibold items-center">
-                <a href="index.html" class="bg-blue-800 text-white py-1 px-3 rounded">Dashboard Rekap</a>
-                <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 px-3 py-1 rounded font-bold transition">
+                <a href="index.html" class="bg-blue-800 text-white py-1.5 px-3 rounded shadow">Dashboard Rekap</a>
+                <a href="admin.html" class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 px-3 py-1.5 rounded font-bold transition">
                     <i class="fa-solid fa-lock mr-1.5"></i> Panel Admin (PIN: 240785)
                 </a>
             </nav>
@@ -54,7 +54,7 @@
         <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h2 class="text-base font-bold text-blue-900"><i class="fa-solid fa-chart-line text-blue-700 mr-2"></i>Rekapitulasi Data Akademik</h2>
-                <p class="text-xs text-gray-500">Pilihan Tahun Pelajaran otomatis menyesuaikan seluruh data yang tersimpan di database.</p>
+                <p class="text-xs text-gray-500">Pilihan Tahun Pelajaran otomatis menyesuaikan seluruh data siswa & guru di database.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
@@ -148,7 +148,7 @@
             </div>
         </div>
 
-        <!-- TABEL REKAPITULASI USIA SISWA (BARU) -->
+        <!-- TABEL REKAPITULASI USIA SISWA -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <div>
@@ -171,26 +171,31 @@
             </div>
         </div>
 
-        <!-- TABEL DAFTAR GURU & TENDIK (PTK) -->
+        <!-- TABEL DAFTAR GURU & TENDIK (PTK) - DILENGKAPI TTL, NIK, TMT, DILENGKAPI FILTER PERIODE -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
-            <div class="flex justify-between items-center border-b pb-2">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
                 <div>
                     <h3 class="font-bold text-sm text-green-900"><i class="fa-solid fa-chalkboard-user text-green-700 mr-2"></i>Daftar Guru & Tenaga Kependidikan (PTK)</h3>
-                    <p class="text-[11px] text-gray-500">Pendidik dan Tenaga Kependidikan SDN 03 Limbangan.</p>
+                    <p class="text-[11px] text-gray-500">Data Pendidik & Tendik SDN 03 Limbangan (Meliputi NIP, NIK, TTL, TMT & Jabatan).</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded" id="lbl-rekap-guru-periode">-</span>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="bg-gray-100 uppercase font-semibold text-gray-700">
-                            <th class="py-2 px-3 border">NIP / NUPTK</th>
-                            <th class="py-2 px-3 border">Nama Lengkap Guru</th>
-                            <th class="py-2 px-3 border">JK</th>
-                            <th class="py-2 px-3 border">Jabatan / Tugas</th>
+                            <th class="py-2.5 px-3 border">NIP / NIK</th>
+                            <th class="py-2.5 px-3 border">Nama Lengkap Guru</th>
+                            <th class="py-2.5 px-3 border">JK</th>
+                            <th class="py-2.5 px-3 border">TTL (Tempat, Tgl Lahir)</th>
+                            <th class="py-2.5 px-3 border">TMT Kepegawaian</th>
+                            <th class="py-2.5 px-3 border">Jabatan / Status</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-pub-guru" class="divide-y text-xs">
-                        <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data guru.</td></tr>
+                        <tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data guru pada periode ini.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -373,26 +378,41 @@
 
         function renderPubGuru() {
             const tbody = document.getElementById('tbl-pub-guru');
+            const selectedTP = document.getElementById('filter-tp').value;
+            const selectedSMT = document.getElementById('filter-smt').value;
+
+            document.getElementById('lbl-rekap-guru-periode').innerText = `${selectedTP || '-'} - ${selectedSMT}`;
+
             tbody.innerHTML = '';
             const keys = Object.keys(allGuru);
-            document.getElementById('stat-guru').innerText = keys.length;
 
-            if(keys.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data guru.</td></tr>';
-                return;
-            }
-
+            let filteredGuruCount = 0;
             keys.forEach(k => {
                 const g = allGuru[k];
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-2 px-3 border font-mono">${g.nip || '-'}</td>
-                        <td class="py-2 px-3 border font-bold text-gray-900">${g.nama || '-'}</td>
-                        <td class="py-2 px-3 border">${g.jk || '-'}</td>
-                        <td class="py-2 px-3 border font-semibold text-green-800">${g.jabatan || g.tugas || 'Guru / PTK'}</td>
-                    </tr>
-                `;
+                const gTP = g.tahun_pelajaran || "2025/2026";
+                const gSMT = g.semester || "Ganjil";
+
+                if (gTP === selectedTP && gSMT === selectedSMT) {
+                    filteredGuruCount++;
+                    const ttl = (g.tempat_lahir || g.tgl_lahir) ? `${g.tempat_lahir || '-'}, ${g.tgl_lahir || '-'}` : '-';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 border font-mono">${g.nip || '-'}<br><span class="text-[10px] text-gray-500">NIK: ${g.nik || '-'}</span></td>
+                            <td class="py-2 px-3 border font-bold text-gray-900">${g.nama || '-'}</td>
+                            <td class="py-2 px-3 border">${g.jk || '-'}</td>
+                            <td class="py-2 px-3 border">${ttl}</td>
+                            <td class="py-2 px-3 border font-mono">${g.tmt || '-'}</td>
+                            <td class="py-2 px-3 border font-semibold text-green-800">${g.jabatan || 'Guru'}<br><span class="text-[10px] text-gray-500">${g.status_peg || '-'}</span></td>
+                        </tr>
+                    `;
+                }
             });
+
+            document.getElementById('stat-guru').innerText = filteredGuruCount;
+
+            if(filteredGuruCount === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data guru pada periode ini.</td></tr>';
+            }
         }
 
         function updateTahunPelajaranDropdown() {
@@ -400,11 +420,8 @@
             const currentSelected = selectTP.value;
             
             let tpSet = new Set();
-            Object.values(allSiswa).forEach(s => {
-                if(s.tahun_pelajaran) {
-                    tpSet.add(s.tahun_pelajaran.trim());
-                }
-            });
+            Object.values(allSiswa).forEach(s => { if(s.tahun_pelajaran) tpSet.add(s.tahun_pelajaran.trim()); });
+            Object.values(allGuru).forEach(g => { if(g.tahun_pelajaran) tpSet.add(g.tahun_pelajaran.trim()); });
 
             if(tpSet.size === 0) tpSet.add("2025/2026");
 
@@ -458,11 +475,11 @@
 
             document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP || '-'} - ${selectedSMT}`;
 
+            renderPubGuru();
+
             const siswaKeys = Object.keys(allSiswa);
             let totalSiswaPeriode = 0, countPIP = 0, countL = 0, countP = 0;
             const rekapKelas = Array.from({ length: 6 }, () => [0, 0, 0, 0]);
-            
-            // Rekap Usia: [<6, 6-7, 8-9, 10-11, 12-13, >13] -> [L, P, Total]
             const rekapUsia = Array.from({ length: 6 }, () => [0, 0, 0]);
 
             const tbodySiswa = document.getElementById('tbl-daftar-siswa-rekap');
@@ -495,7 +512,6 @@
                         rekapKelas[classIndex][2]++;
                     }
 
-                    // Perhitungan Kelompok Usia
                     const ageNum = getAgeNumber(s.tgl_lahir);
                     if(ageNum !== -1) {
                         let ageGroupIdx = -1;
@@ -548,7 +564,6 @@
             document.getElementById('stat-siswa').innerText = totalSiswaPeriode;
             document.getElementById('stat-pip').innerText = countPIP;
 
-            // Render Tabel Rekap Kelas
             const tbodyKelas = document.getElementById('tbl-rekap-kelas-body');
             tbodyKelas.innerHTML = '';
             let sumL=0, sumP=0, sumAll=0, sumPIP=0;
@@ -573,7 +588,6 @@
             document.getElementById('tot-all').innerText = `${sumAll} Siswa`;
             document.getElementById('tot-pip').innerText = `${sumPIP} Siswa`;
 
-            // Render Tabel Rekap Usia
             const tbodyUsia = document.getElementById('tbl-rekap-usia-body');
             tbodyUsia.innerHTML = '';
             const labelsUsia = ['< 6 Tahun', '6 - 7 Tahun', '8 - 9 Tahun', '10 - 11 Tahun', '12 - 13 Tahun', '> 13 Tahun'];
