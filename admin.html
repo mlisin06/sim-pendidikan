@@ -42,7 +42,7 @@
             </form>
             <div class="text-left">
                 <a href="index.html" class="text-[11px] text-blue-600 hover:underline flex items-center justify-center">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Dashboard Rekap
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Dashboard
                 </a>
             </div>
         </div>
@@ -62,7 +62,7 @@
             </div>
             <nav class="flex space-x-3 text-xs font-semibold">
                 <a href="index.html" class="bg-blue-700 hover:bg-blue-800 text-white py-1.5 px-3 rounded shadow">
-                    <i class="fa-solid fa-chart-pie mr-1"></i> Kembali Ke Dashboard Rekap
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Kembali Ke Dashboard
                 </a>
             </nav>
         </div>
@@ -74,15 +74,15 @@
         <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
             <div class="border-b pb-3 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div>
-                    <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal (Aman Multi-Tahun & Multi-Semester)</h3>
-                    <p class="text-xs text-gray-500">Unduh template Excel sesuai kategori untuk memudahkan pengisian data sebelum diunggah.</p>
+                    <h3 class="text-base font-bold text-gray-900"><i class="fa-solid fa-file-excel text-green-700 mr-2"></i>Import Data Massal & Template</h3>
+                    <p class="text-xs text-gray-500">Unduh template Excel atau upload database siswa dan guru secara aman.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="downloadTemplateExcel()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
-                        <i class="fa-solid fa-download mr-1"></i> Template Excel Siswa
+                        <i class="fa-solid fa-download mr-1"></i> Template Dapodik Siswa
                     </button>
                     <button onclick="downloadTemplateGuru()" class="bg-emerald-800 hover:bg-emerald-900 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
-                        <i class="fa-solid fa-download mr-1"></i> Template Excel Guru (TTL, NIK, TMT)
+                        <i class="fa-solid fa-download mr-1"></i> Template Guru (TTL, NIK, TMT)
                     </button>
                 </div>
             </div>
@@ -110,9 +110,15 @@
                         <i class="fa-solid fa-trash-can mr-1"></i> Hapus Terpilih (<span id="selected-count">0</span>)
                     </button>
                 </div>
-                <button onclick="openFormTambah()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
-                    <i class="fa-solid fa-plus mr-1"></i> Tambah Siswa Baru
-                </button>
+                <div class="flex flex-wrap gap-2">
+                    <!-- TOMBOL DOWNLOAD DATA SISWA EXCEL BERDASARKAN FILTER -->
+                    <button onclick="downloadExcelDataSiswa()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
+                        <i class="fa-solid fa-file-excel mr-1"></i> Download Data Siswa (No, Nama, NIS, NISN, Kelas, Ayah)
+                    </button>
+                    <button onclick="openFormTambah()" class="bg-green-700 hover:bg-green-800 text-white font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap shadow">
+                        <i class="fa-solid fa-plus mr-1"></i> Tambah Siswa Baru
+                    </button>
+                </div>
             </div>
 
             <!-- PANEL FILTER KELOLA DIREKTORI SISWA -->
@@ -661,6 +667,53 @@
         }
 
         document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
+
+        // FUNGSI DOWNLOAD EXCEL DATA SISWA (NO, NAMA, NIS, NISN, KELAS, NAMA AYAH) SESUAI FILTER
+        function downloadExcelDataSiswa() {
+            const filterTP = document.getElementById('admin-filter-tp').value;
+            const filterSMT = document.getElementById('admin-filter-smt').value;
+            const filterKelas = document.getElementById('admin-filter-kelas').value;
+
+            const keys = Object.keys(allSiswa);
+            let filteredRows = [];
+            let no = 1;
+
+            keys.forEach(k => {
+                const s = allSiswa[k];
+                const status = s.status || "Aktif";
+                if(status !== "Aktif") return;
+
+                const matchTP = filterTP === "" || (s.tahun_pelajaran || "2025/2026") === filterTP;
+                const matchSMT = filterSMT === "" || (s.semester || "Ganjil") === filterSMT;
+                const rombelStr = (s.rombel || s.kelas || '').toString();
+                const matchKelas = filterKelas === "" || rombelStr.includes(filterKelas);
+
+                if(matchTP && matchSMT && matchKelas) {
+                    filteredRows.push({
+                        "No": no++,
+                        "Nama Lengkap": s.nama || "-",
+                        "NIS / NIPD": s.nipd || "-",
+                        "NISN": s.nisn || "-",
+                        "Kelas": s.rombel || s.kelas || "-",
+                        "Nama Ayah": s.nama_ayah || "-"
+                    });
+                }
+            });
+
+            if(filteredRows.length === 0) {
+                return alert('Tidak ada data siswa yang sesuai dengan filter terpilih untuk diunduh.');
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(filteredRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Siswa");
+
+            const tpFileName = filterTP ? filterTP.replace('/', '-') : 'Semua-TP';
+            const smtFileName = filterSMT || 'Semua-Smt';
+            const kelasFileName = filterKelas ? filterKelas.replace(/\s+/g, '_') : 'Semua-Kelas';
+
+            XLSX.writeFile(workbook, `Data_Siswa_SDN03Limbangan_${tpFileName}_${smtFileName}_${kelasFileName}.xlsx`);
+        }
 
         function renderTableGuruAdmin() {
             const tbody = document.getElementById('tbl-admin-guru');
