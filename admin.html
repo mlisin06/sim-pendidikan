@@ -253,7 +253,7 @@
                 </div>
                 <div class="w-full md:w-64">
                     <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Pencarian Guru</label>
-                    <input type="text" id="search-guru-admin" oninput="renderTableGuruAdmin()" placeholder="Cari NIP / NIK / Nama..." class="px-3 py-1 border rounded text-xs w-full bg-white">
+                    <input type="text" id="search-guru-admin" placeholder="Cari NIP / NIK / Nama..." class="px-3 py-1 border rounded text-xs w-full bg-white">
                 </div>
             </div>
 
@@ -701,7 +701,7 @@
     </footer>
 
     <script>
-        // FUNGSI VERIFIKASI PIN ADMIN (Disesuaikan agar fleksibel & aman untuk file lokal)
+        // FUNGSI VERIFIKASI PIN ADMIN
         function verifyPin(e) {
             if(e) e.preventDefault();
             document.getElementById('modal-pin').classList.add('hidden');
@@ -737,6 +737,10 @@
         let allMutasi = {};
         let allAlumni = {};
 
+        // Debounce timer untuk pencarian tanpa lag
+        let searchSiswaDebounce = null;
+        let searchGuruDebounce = null;
+
         function calculateAge(birthDateStr) {
             if(!birthDateStr) return '-';
             const birth = new Date(birthDateStr);
@@ -755,6 +759,7 @@
             return `${cleanNisn}_${cleanTp}_${cleanSmt}`;
         }
 
+        // OPTIMASI: Menggunakan 'value' terpadu secara efisien
         db.ref('siswa').on('value', snapshot => {
             allSiswa = snapshot.val() || {};
             updateAdminTahunDropdown();
@@ -826,6 +831,7 @@
             });
         }
 
+        // OPTIMASI UTAMA: Batch Render string HTML untuk tabel siswa (Anti-Freeze)
         function renderTableAdmin() {
             const tbody = document.getElementById('tbl-admin-siswa');
             const search = document.getElementById('search-admin').value.toLowerCase();
@@ -833,7 +839,6 @@
             const filterSMT = document.getElementById('admin-filter-smt').value;
             const filterKelas = document.getElementById('admin-filter-kelas').value;
 
-            tbody.innerHTML = '';
             const keys = Object.keys(allSiswa);
 
             const filtered = keys.filter(k => {
@@ -858,10 +863,11 @@
                 return;
             }
 
+            let htmlBuffer = '';
             filtered.forEach(k => {
                 const s = allSiswa[k];
                 const age = calculateAge(s.tgl_lahir);
-                tbody.innerHTML += `
+                htmlBuffer += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border text-center"><input type="checkbox" value="${k}" onchange="updateDeleteGroupButton()" class="chk-siswa rounded cursor-pointer"></td>
                         <td class="p-2 border font-mono">${s.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIPD: ${s.nipd || '-'}</span></td>
@@ -879,15 +885,21 @@
                     </tr>
                 `;
             });
+
+            tbody.innerHTML = htmlBuffer; // Hanya 1x manipulasi DOM
             updateDeleteGroupButton();
         }
 
-        document.getElementById('search-admin').addEventListener('input', renderTableAdmin);
+        // Event pencarian siswa dengan Debounce
+        document.getElementById('search-admin').addEventListener('input', () => {
+            clearTimeout(searchSiswaDebounce);
+            searchSiswaDebounce = setTimeout(renderTableAdmin, 250);
+        });
 
+        // OPTIMASI: Batch Render tabel Alumni
         function renderTableAlumni() {
             const tbody = document.getElementById('tbl-admin-alumni');
             const filterThn = document.getElementById('admin-filter-alumni-thn').value;
-            tbody.innerHTML = '';
             const keys = Object.keys(allAlumni);
 
             const filtered = keys.filter(k => {
@@ -900,9 +912,10 @@
                 return;
             }
 
+            let htmlBuffer = '';
             filtered.forEach(k => {
                 const a = allAlumni[k];
-                tbody.innerHTML += `
+                htmlBuffer += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border font-mono">${a.nisn || '-'}<br><span class="text-[10px] text-gray-400">NIS: ${a.nipd || '-'}</span></td>
                         <td class="p-2 border font-bold text-gray-900">${a.nama || '-'}</td>
@@ -916,6 +929,7 @@
                     </tr>
                 `;
             });
+            tbody.innerHTML = htmlBuffer;
         }
 
         // KENAIKAN KELAS INTERAKTIF DENGAN CHECKBOX
@@ -1031,15 +1045,17 @@
 
         function openModalKelulusanMassal() {
             const select = document.getElementById('kl-select-siswa');
-            select.innerHTML = '<option value="">-- Pilih Siswa Kelas 6 --</option>';
+            let opts = '<option value="">-- Pilih Siswa Kelas 6 --</option>';
             
             Object.keys(allSiswa).forEach(k => {
                 const s = allSiswa[k];
                 const rombel = (s.rombel || s.kelas || '').toString();
                 if(rombel.includes("6") && (s.status || "Aktif") === "Aktif") {
-                    select.innerHTML += `<option value="${k}">${s.nama} (NISN: ${s.nisn})</option>`;
+                    opts += `<option value="${k}">${s.nama} (NISN: ${s.nisn})</option>`;
                 }
             });
+
+            select.innerHTML = opts;
 
             const container = document.getElementById('container-mapel-dinamis');
             container.innerHTML = '';
@@ -1119,7 +1135,6 @@
             document.getElementById('sk-tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
             const tbody = document.getElementById('sk-tbody-nilai');
-            tbody.innerHTML = '';
             
             let totalNilai = 0;
             const listMapel = a.mapel_dinamis || [];
@@ -1127,10 +1142,11 @@
             if(listMapel.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="border border-black p-2 text-center text-gray-400">Belum ada transkrip nilai dinamis.</td></tr>';
             } else {
+                let rowsHtml = '';
                 listMapel.forEach((m, idx) => {
                     const numVal = parseFloat(m.nilai) || 0;
                     totalNilai += numVal;
-                    tbody.innerHTML += `
+                    rowsHtml += `
                         <tr>
                             <td class="border border-black p-1">${idx + 1}</td>
                             <td class="border border-black p-1 text-left px-2 font-semibold">${m.name}</td>
@@ -1138,6 +1154,7 @@
                         </tr>
                     `;
                 });
+                tbody.innerHTML = rowsHtml;
             }
 
             const avg = listMapel.length > 0 ? (totalNilai / listMapel.length).toFixed(2) : "0.00";
@@ -1186,13 +1203,13 @@
             XLSX.writeFile(workbook, `Data_Siswa_SDN03Limbangan.xlsx`);
         }
 
+        // OPTIMASI: Batch Render tabel Guru
         function renderTableGuruAdmin() {
             const tbody = document.getElementById('tbl-admin-guru');
             const search = document.getElementById('search-guru-admin').value.toLowerCase();
             const filterTP = document.getElementById('admin-filter-guru-tp').value;
             const filterSMT = document.getElementById('admin-filter-guru-smt').value;
 
-            tbody.innerHTML = '';
             const keys = Object.keys(allGuru);
 
             const filtered = keys.filter(k => {
@@ -1210,10 +1227,11 @@
                 return;
             }
 
+            let htmlBuffer = '';
             filtered.forEach(k => {
                 const g = allGuru[k];
                 const ttl = (g.tempat_lahir || g.tgl_lahir) ? `${g.tempat_lahir || '-'}, ${g.tgl_lahir || '-'}` : '-';
-                tbody.innerHTML += `
+                htmlBuffer += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border font-mono">${g.nip || '-'}<br><span class="text-[10px] text-gray-500">NIK: ${g.nik || '-'}</span></td>
                         <td class="p-2 border font-bold text-gray-900">${g.nama || '-'}<br><span class="text-[10px] text-emerald-800 font-semibold">HP: ${g.hp || '-'}</span></td>
@@ -1229,7 +1247,14 @@
                     </tr>
                 `;
             });
+            tbody.innerHTML = htmlBuffer;
         }
+
+        // Event pencarian guru dengan Debounce
+        document.getElementById('search-guru-admin').addEventListener('input', () => {
+            clearTimeout(searchGuruDebounce);
+            searchGuruDebounce = setTimeout(renderTableGuruAdmin, 250);
+        });
 
         function openFormGuruTambah() {
             document.getElementById('form-guru').reset();
@@ -1526,9 +1551,9 @@
             closeModalMutasiMasuk();
         }
 
+        // OPTIMASI: Batch Render tabel Mutasi
         function renderTableMutasi() {
             const tbody = document.getElementById('tbl-admin-mutasi');
-            tbody.innerHTML = '';
             const keys = Object.keys(allMutasi);
 
             if(keys.length === 0) {
@@ -1536,11 +1561,12 @@
                 return;
             }
 
+            let htmlBuffer = '';
             keys.forEach(k => {
                 const m = allMutasi[k];
                 const badgeClass = m.jenis_mutasi === "Masuk" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
 
-                tbody.innerHTML += `
+                htmlBuffer += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border font-bold"><span class="px-2 py-0.5 rounded ${badgeClass}">${m.jenis_mutasi}</span></td>
                         <td class="p-2 border font-mono">${m.tgl_mutasi || '-'}</td>
@@ -1554,6 +1580,8 @@
                     </tr>
                 `;
             });
+
+            tbody.innerHTML = htmlBuffer;
         }
 
         function batalkanMutasi(key) {
