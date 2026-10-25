@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIM SDN 03 Limbangan - Dashboard Analitik & Rekapitulasi</title>
     
-    <!-- Favicon (Tab Web) -->
+    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="shortcut icon" type="image/jpeg" href="logo.jpg">
 
@@ -15,13 +15,10 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/mlisin06/sim-pendidikan/main/logo.jpg">
     <meta property="og:type" content="website">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS & Font Awesome & Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDK (v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
@@ -60,7 +57,6 @@
                 <div>
                     <label class="block text-[10px] font-bold text-gray-600 mb-0.5">Tahun Pelajaran</label>
                     <select id="filter-tp" onchange="updateDashboard()" class="px-3 py-1.5 border rounded-md text-xs font-semibold bg-gray-50 focus:ring-2 focus:ring-blue-500">
-                        <!-- Opsi terisi dinamis dari database -->
                     </select>
                 </div>
                 <div>
@@ -179,10 +175,11 @@
                             <th class="py-2 px-3 border">JK</th>
                             <th class="py-2 px-3 border">Tahun Lulus</th>
                             <th class="py-2 px-3 border">No. Ijazah / SKHU</th>
+                            <th class="py-2 px-3 border text-center">Aksi (Detail Nilai)</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-public-alumni" class="divide-y text-xs">
-                        <tr><td colspan="6" class="text-center py-4 text-gray-400">Memuat data rekap lulusan...</td></tr>
+                        <tr><td colspan="7" class="text-center py-4 text-gray-400">Memuat data rekap lulusan...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -211,7 +208,7 @@
             </div>
         </div>
 
-        <!-- TABEL DAFTAR GURU & TENDIK (PTK) - DILENGKAPI TTL, NIK, TMT, DILENGKAPI FILTER PERIODE -->
+        <!-- TABEL DAFTAR GURU & TENDIK -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
                 <div>
@@ -241,7 +238,7 @@
             </div>
         </div>
 
-        <!-- TABEL DATA MUTASI (MASUK & KELUAR) -->
+        <!-- TABEL DATA MUTASI -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="border-b pb-2">
                 <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-arrows-rotate text-blue-700 mr-2"></i>Rekapitulasi Mutasi Siswa (Masuk & Keluar)</h3>
@@ -266,7 +263,7 @@
             </div>
         </div>
 
-        <!-- VISUALISASI GRAFIK INTERAKTIF -->
+        <!-- GRAFIK INTERAKTIF -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3 md:col-span-2">
                 <div class="flex justify-between items-center border-b pb-2">
@@ -282,7 +279,6 @@
             </div>
         </div>
 
-        <!-- GRAFIK RENTANG USIA -->
         <div class="bg-white p-4 rounded-xl shadow-sm border space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h4 class="font-bold text-xs text-gray-800"><i class="fa-solid fa-chart-line text-purple-600 mr-1.5"></i>Grafik Distribusi Rentang Usia Siswa</h4>
@@ -290,7 +286,7 @@
             <div class="h-60 relative"><canvas id="chartUsia"></canvas></div>
         </div>
 
-        <!-- DAFTAR SISWA SESUAI FILTER (POSISI DI PALING BAWAH) -->
+        <!-- DAFTAR SISWA SESUAI FILTER -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-2">
                 <h3 class="font-bold text-sm text-blue-900"><i class="fa-solid fa-address-book text-blue-700 mr-2"></i>Daftar Siswa Sesuai Periode & Kelas Terpilih</h3>
@@ -318,7 +314,78 @@
 
     </main>
 
-    <!-- Modal Detail Lengkap Siswa -->
+    <!-- MODAL DETAIL NILAI ALUMNI (READ-ONLY) -->
+    <div id="modal-public-alumni-detail" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] flex flex-col overflow-hidden">
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm"><i class="fa-solid fa-award mr-1"></i> Transkrip Nilai & Keterangan Kelulusan Alumni</h4>
+                <button onclick="closeModalPublicAlumni()" class="text-white hover:text-red-200 font-bold text-lg">&times;</button>
+            </div>
+            
+            <div class="p-6 bg-white overflow-y-auto text-gray-900 font-serif space-y-4 text-xs leading-relaxed">
+                <div class="text-center border-b-2 border-black pb-3 space-y-1">
+                    <h3 class="font-bold text-sm uppercase">PEMERINTAH KABUPATEN PEMALANG</h3>
+                    <h3 class="font-bold text-sm uppercase">DINAS PENDIDIKAN DAN KEBUDAYAAN</h3>
+                    <h2 class="font-bold text-base uppercase">SD NEGERI 03 LIMBANGAN</h2>
+                    <p class="text-[10px] font-sans">Desa Limbangan, Kecamatan Ulujami, Kabupaten Pemalang, Jawa Tengah</p>
+                </div>
+
+                <div class="text-center space-y-1 pt-2">
+                    <h4 class="font-bold text-sm underline uppercase">SURAT KETERANGAN KELULUSAN & TRANSKRIP NILAI</h4>
+                    <p class="font-sans text-[11px]">Nomor: <span id="pub-sk-no-ijazah">-</span></p>
+                </div>
+
+                <div class="space-y-1 pt-2 font-sans text-xs">
+                    <p>Yang bertanda tangan di bawah ini Kepala Sekolah Dasar Negeri 03 Limbangan, Kecamatan Ulujami, Kabupaten Pemalang menerangkan bahwa:</p>
+                    <table class="w-full my-2 space-y-1">
+                        <tr><td class="w-36 font-semibold">Nama Lengkap</td><td class="w-4">:</td><td id="pub-sk-nama" class="font-bold"></td></tr>
+                        <tr><td class="font-semibold">NISN / NIS</td><td>:</td><td id="pub-sk-nisn"></td></tr>
+                        <tr><td class="font-semibold">Tempat, Tanggal Lahir</td><td>:</td><td id="pub-sk-ttl"></td></tr>
+                        <tr><td class="font-semibold">Tahun Kelulusan</td><td>:</td><td id="pub-sk-thn"></td></tr>
+                    </table>
+                    <p>Dinyatakan <b>LULUS</b> dari satuan pendidikan SDN 03 Limbangan setelah menyelesaikan seluruh program pembelajaran. Berikut adalah daftar nilai hasil belajar (Transkrip Nilai):</p>
+                </div>
+
+                <table class="w-full border-collapse border border-black text-center text-xs font-sans">
+                    <thead>
+                        <tr class="bg-gray-100 uppercase font-bold">
+                            <th class="border border-black p-1.5 w-10">No</th>
+                            <th class="border border-black p-1.5 text-left px-2">Mata Pelajaran</th>
+                            <th class="border border-black p-1.5 w-28">Nilai Akhir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pub-sk-tbody-nilai"></tbody>
+                    <tfoot class="font-bold bg-gray-50">
+                        <tr>
+                            <td colspan="2" class="border border-black p-1 text-right px-2 uppercase">Rata-Rata Nilai</td>
+                            <td id="pub-sk-rata-rata" class="border border-black p-1 font-mono">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="pt-6 flex justify-between font-sans text-xs">
+                    <div>
+                        <p>Mengetahui,</p>
+                        <p>Orang Tua / Wali Murid</p>
+                        <br><br><br>
+                        <p class="underline font-bold">( ........................................ )</p>
+                    </div>
+                    <div class="text-right">
+                        <p>Pemalang, <span id="pub-sk-tgl-cetak"></span></p>
+                        <p>Kepala SDN 03 Limbangan</p>
+                        <br><br><br>
+                        <p class="underline font-bold" id="pub-sk-nama-ks">Muhlisin, S.Pd.</p>
+                        <p class="font-mono text-[10px]" id="pub-sk-nip-ks">NIP. 198507242010011001</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-100 p-3 text-right">
+                <button onclick="closeModalPublicAlumni()" class="bg-gray-600 text-white px-4 py-1.5 rounded text-xs font-bold">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Lengkap Siswa (68 Poin Dapodik) -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -338,7 +405,6 @@
         <p class="text-gray-500 mt-0.5">Created By Muhlisin</p>
     </footer>
 
-    <!-- Firebase Script & Logic -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyD5Ak7WXjVb34N38eKrbEgs-N7HhGWFX1I",
@@ -432,17 +498,12 @@
             if(!selectThn) return;
             const currentSelected = selectThn.value;
             let thnSet = new Set();
-            
-            Object.values(allAlumni).forEach(a => { 
-                if(a.tahun_lulus) thnSet.add(a.tahun_lulus.trim()); 
-            });
-
+            Object.values(allAlumni).forEach(a => { if(a.tahun_lulus) thnSet.add(a.tahun_lulus.trim()); });
             const sortedThn = Array.from(thnSet).sort().reverse();
             selectThn.innerHTML = '<option value="">Semua Tahun</option>';
             sortedThn.forEach(thn => {
                 const opt = document.createElement('option');
-                opt.value = thn; 
-                opt.innerText = thn;
+                opt.value = thn; opt.innerText = thn;
                 if(thn === currentSelected) opt.selected = true;
                 selectThn.appendChild(opt);
             });
@@ -456,14 +517,13 @@
             const filterThn = selectThn.value;
             tbody.innerHTML = '';
             const keys = Object.keys(allAlumni);
-
             const filtered = keys.filter(k => {
                 const a = allAlumni[k];
                 return filterThn === "" || (a.tahun_lulus || "") === filterThn;
             });
 
             if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400">Belum ada data rekap lulusan / alumni.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400">Belum ada data rekap lulusan / alumni.</td></tr>';
                 return;
             }
 
@@ -478,27 +538,70 @@
                         <td class="py-2 px-3 border">${a.jk || '-'}</td>
                         <td class="py-2 px-3 border font-bold text-indigo-900">${a.tahun_lulus || '-'}</td>
                         <td class="py-2 px-3 border font-mono">${a.no_ijazah || '-'}</td>
+                        <td class="py-2 px-3 border text-center">
+                            <button onclick="viewPublicAlumniDetail('${k}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-eye mr-1"></i> Detail Nilai</button>
+                        </td>
                     </tr>
                 `;
             });
         }
 
+        function viewPublicAlumniDetail(key) {
+            const a = allAlumni[key];
+            if(!a) return;
+
+            document.getElementById('pub-sk-no-ijazah').innerText = a.no_ijazah || '-';
+            document.getElementById('pub-sk-nama').innerText = a.nama || '-';
+            document.getElementById('pub-sk-nisn').innerText = `${a.nisn || '-'} / ${a.nipd || '-'}`;
+            document.getElementById('pub-sk-ttl').innerText = `${a.tempat_lahir || '-'}, ${a.tgl_lahir || '-'}`;
+            document.getElementById('pub-sk-thn').innerText = a.tahun_lulus || '-';
+            document.getElementById('pub-sk-tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+
+            document.getElementById('pub-sk-nama-ks').innerText = a.nama_ks || 'Muhlisin, S.Pd.';
+            document.getElementById('pub-sk-nip-ks').innerText = `NIP. ${a.nip_ks || '198507242010011001'}`;
+
+            const tbody = document.getElementById('pub-sk-tbody-nilai');
+            let totalNilai = 0;
+            const listMapel = a.mapel_dinamis || [];
+
+            if(listMapel.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="border border-black p-2 text-center text-gray-400">Belum ada transkrip nilai dinamis.</td></tr>';
+            } else {
+                let rowsHtml = '';
+                listMapel.forEach((m, idx) => {
+                    const numVal = parseFloat(m.nilai) || 0;
+                    totalNilai += numVal;
+                    rowsHtml += `
+                        <tr>
+                            <td class="border border-black p-1">${idx + 1}</td>
+                            <td class="border border-black p-1 text-left px-2 font-semibold">${m.name}</td>
+                            <td class="border border-black p-1 font-mono font-bold">${numVal.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = rowsHtml;
+            }
+
+            const avg = listMapel.length > 0 ? (totalNilai / listMapel.length).toFixed(2) : "0.00";
+            document.getElementById('pub-sk-rata-rata').innerText = avg;
+
+            document.getElementById('modal-public-alumni-detail').classList.remove('hidden');
+        }
+
+        function closeModalPublicAlumni() { document.getElementById('modal-public-alumni-detail').classList.add('hidden'); }
+
         function renderPubGuru() {
             const tbody = document.getElementById('tbl-pub-guru');
             const selectedTP = document.getElementById('filter-tp').value;
             const selectedSMT = document.getElementById('filter-smt').value;
-
             document.getElementById('lbl-rekap-guru-periode').innerText = `${selectedTP || '-'} - ${selectedSMT}`;
-
             tbody.innerHTML = '';
             const keys = Object.keys(allGuru);
-
             let filteredGuruCount = 0;
             keys.forEach(k => {
                 const g = allGuru[k];
                 const gTP = g.tahun_pelajaran || "2025/2026";
                 const gSMT = g.semester || "Ganjil";
-
                 if (gTP === selectedTP && gSMT === selectedSMT) {
                     filteredGuruCount++;
                     const ttl = (g.tempat_lahir || g.tgl_lahir) ? `${g.tempat_lahir || '-'}, ${g.tgl_lahir || '-'}` : '-';
@@ -514,9 +617,7 @@
                     `;
                 }
             });
-
             document.getElementById('stat-guru').innerText = filteredGuruCount;
-
             if(filteredGuruCount === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data guru pada periode ini.</td></tr>';
             }
@@ -525,26 +626,19 @@
         function updateTahunPelajaranDropdown() {
             const selectTP = document.getElementById('filter-tp');
             const currentSelected = selectTP.value;
-            
             let tpSet = new Set();
             Object.values(allSiswa).forEach(s => { if(s.tahun_pelajaran) tpSet.add(s.tahun_pelajaran.trim()); });
             Object.values(allGuru).forEach(g => { if(g.tahun_pelajaran) tpSet.add(g.tahun_pelajaran.trim()); });
-
             if(tpSet.size === 0) tpSet.add("2025/2026");
-
             const sortedTP = Array.from(tpSet).sort().reverse();
             selectTP.innerHTML = '';
             sortedTP.forEach(tp => {
                 const opt = document.createElement('option');
-                opt.value = tp;
-                opt.innerText = tp;
+                opt.value = tp; opt.innerText = tp;
                 if(tp === currentSelected) opt.selected = true;
                 selectTP.appendChild(opt);
             });
-
-            if(!tpSet.has(currentSelected) && sortedTP.length > 0) {
-                selectTP.value = sortedTP[0];
-            }
+            if(!tpSet.has(currentSelected) && sortedTP.length > 0) { selectTP.value = sortedTP[0]; }
         }
 
         function renderPubMutasi() {
@@ -552,12 +646,10 @@
             tbody.innerHTML = '';
             const keys = Object.keys(allMutasi);
             document.getElementById('stat-mutasi').innerText = keys.length;
-
             if(keys.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada data mutasi.</td></tr>';
                 return;
             }
-
             keys.forEach(k => {
                 const m = allMutasi[k];
                 const badgeClass = m.jenis_mutasi === "Masuk" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
@@ -581,7 +673,6 @@
             const searchQuery = document.getElementById('search-siswa-rekap').value.toLowerCase();
 
             document.getElementById('lbl-rekap-kelas-periode').innerText = `${selectedTP || '-'} - ${selectedSMT}`;
-
             renderPubGuru();
 
             const siswaKeys = Object.keys(allSiswa);
@@ -604,7 +695,6 @@
                     const jk = (s.jk || '').toUpperCase();
                     const isL = (jk === 'L' || jk.includes('LAKI'));
                     const isP = (jk === 'P' || jk.includes('PEREMPUAN'));
-
                     if(isL) countL++; else if(isP) countP++;
 
                     const rombelStr = (s.rombel || s.kelas || '').toString();
@@ -674,11 +764,9 @@
             const tbodyKelas = document.getElementById('tbl-rekap-kelas-body');
             tbodyKelas.innerHTML = '';
             let sumL=0, sumP=0, sumAll=0, sumPIP=0;
-
             for(let i=0; i<6; i++) {
                 const rL = rekapKelas[i][0], rP = rekapKelas[i][1], rTot = rekapKelas[i][2], rPIP = rekapKelas[i][3];
                 sumL += rL; sumP += rP; sumAll += rTot; sumPIP += rPIP;
-
                 tbodyKelas.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="py-2 px-3 border text-left font-bold text-blue-900">Kelas ${i+1}</td>
@@ -689,7 +777,6 @@
                     </tr>
                 `;
             }
-
             document.getElementById('tot-l').innerText = `${sumL} Siswa`;
             document.getElementById('tot-p').innerText = `${sumP} Siswa`;
             document.getElementById('tot-all').innerText = `${sumAll} Siswa`;
@@ -716,6 +803,7 @@
 
         document.getElementById('search-siswa-rekap').addEventListener('input', updateDashboard);
 
+        // FUNGSI DETAIL LENGKAP 68 POIN DAPODIK PADA DASHBOARD PUBLIK
         function showDetail(key) {
             const s = allSiswa[key];
             if(!s) return;
