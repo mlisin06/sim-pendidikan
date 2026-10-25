@@ -19,6 +19,27 @@
     <!-- Firebase SDK (v9 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <!-- CSS Khusus Cetak SKHU -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 10px;
+                background: white;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col">
 
@@ -195,7 +216,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b pb-3">
                 <div>
                     <h3 class="text-base font-bold text-indigo-900"><i class="fa-solid fa-user-graduate text-indigo-700 mr-2"></i>Direktori Arsip Alumni & Transkrip Nilai (SKHU)</h3>
-                    <p class="text-xs text-gray-500">Daftar siswa yang telah lulus dengan transkrip nilai dinamis dan cetak SKHU resmi.</p>
+                    <p class="text-xs text-gray-500">Daftar siswa yang telah lulus dengan transkrip nilai dinamis, lihat/edit data, dan cetak SKHU resmi.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-[11px] font-bold text-gray-600">Tahun Kelulusan:</label>
@@ -379,6 +400,17 @@
                     <div><label class="block font-semibold mb-1">Nomor Ijazah / SKHU *</label><input type="text" id="kl-no-ijazah" placeholder="DN-03/M-SD/..." required class="w-full p-2 border rounded"></div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                    <div>
+                        <label class="block font-semibold mb-1 text-indigo-900">Nama Kepala Sekolah (Saat Lulus) *</label>
+                        <input type="text" id="kl-nama-ks" value="Muhlisin, S.Pd." required class="w-full p-2 border rounded bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1 text-indigo-900">NIP Kepala Sekolah *</label>
+                        <input type="text" id="kl-nip-ks" value="198507242010011001" required class="w-full p-2 border rounded bg-white font-mono">
+                    </div>
+                </div>
+
                 <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200 space-y-3">
                     <div class="flex justify-between items-center border-b border-emerald-300 pb-2">
                         <h5 class="font-bold text-emerald-900 uppercase"><i class="fa-solid fa-list-ol mr-1"></i> Transkrip Mata Pelajaran & Nilai (Dinamis)</h5>
@@ -386,13 +418,59 @@
                             <i class="fa-solid fa-plus mr-1"></i> Tambah Mapel
                         </button>
                     </div>
-                    
                     <div id="container-mapel-dinamis" class="space-y-2"></div>
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeModalKelulusan()" class="bg-gray-400 text-white px-4 py-2 rounded">Batal</button>
                     <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded shadow">Simpan & Nyatakan Lulus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT DATA ALUMNI -->
+    <div id="modal-edit-alumni" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <h4 class="font-bold text-sm" id="edit-alumni-title"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit Arsip Alumni & Transkrip Nilai</h4>
+                <button onclick="closeModalEditAlumni()" class="text-white hover:text-red-200 font-bold text-lg">&times;</button>
+            </div>
+            <form onsubmit="handleUpdateAlumni(event)" class="p-6 overflow-y-auto text-xs space-y-4">
+                <input type="hidden" id="ea-siswa-key">
+                <div>
+                    <label class="block font-semibold mb-1">Nama Alumni (Siswa)</label>
+                    <input type="text" id="ea-nama-display" readonly class="w-full p-2 border rounded bg-gray-100 font-bold text-gray-700">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block font-semibold mb-1">Tahun Kelulusan *</label><input type="text" id="ea-thn-lulus" required class="w-full p-2 border rounded"></div>
+                    <div><label class="block font-semibold mb-1">Nomor Ijazah / SKHU *</label><input type="text" id="ea-no-ijazah" required class="w-full p-2 border rounded"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                    <div>
+                        <label class="block font-semibold mb-1 text-indigo-900">Nama Kepala Sekolah (Saat Lulus) *</label>
+                        <input type="text" id="ea-nama-ks" required class="w-full p-2 border rounded bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1 text-indigo-900">NIP Kepala Sekolah *</label>
+                        <input type="text" id="ea-nip-ks" required class="w-full p-2 border rounded bg-white font-mono">
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 space-y-3">
+                    <div class="flex justify-between items-center border-b border-indigo-300 pb-2">
+                        <h5 class="font-bold text-indigo-900 uppercase"><i class="fa-solid fa-list-ol mr-1"></i> Transkrip Mata Pelajaran & Nilai</h5>
+                        <button type="button" onclick="addEditMapelRow()" class="bg-indigo-700 hover:bg-indigo-800 text-white text-[11px] font-bold px-2.5 py-1 rounded shadow">
+                            <i class="fa-solid fa-plus mr-1"></i> Tambah Mapel
+                        </button>
+                    </div>
+                    <div id="container-edit-mapel-dinamis" class="space-y-2"></div>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModalEditAlumni()" class="bg-gray-400 text-white px-4 py-2 rounded">Batal</button>
+                    <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-5 py-2 rounded shadow">Simpan Perubahan Alumni</button>
                 </div>
             </form>
         </div>
@@ -461,8 +539,8 @@
                         <p>Pemalang, <span id="sk-tgl-cetak"></span></p>
                         <p>Kepala SDN 03 Limbangan</p>
                         <br><br><br>
-                        <p class="underline font-bold">Muhlisin, S.Pd.</p>
-                        <p class="font-mono text-[10px]">NIP. 198507242010011001</p>
+                        <p class="underline font-bold" id="sk-nama-ks">Muhlisin, S.Pd.</p>
+                        <p class="font-mono text-[10px]" id="sk-nip-ks">NIP. 198507242010011001</p>
                     </div>
                 </div>
             </div>
@@ -621,57 +699,6 @@
                     </div>
                 </div>
 
-                <div class="bg-purple-50/60 p-4 rounded-lg border space-y-3">
-                    <h5 class="font-bold text-purple-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-child mr-1"></i> 2. Perkembangan Fisik & Tambahan</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <div><label class="block font-semibold mb-1">Tinggi Badan (cm)</label><input type="number" id="f-tb" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Berat Badan (kg)</label><input type="number" id="f-bb" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Lingkar Kepala (cm)</label><input type="number" id="f-lingkar-kepala" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Anak Ke-berapa</label><input type="number" id="f-anak-ke" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Jml Saudara Kandung</label><input type="number" id="f-jml-saudara" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Kebutuhan Khusus</label><input type="text" id="f-kebutuhan-khusus" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Jenis Tinggal</label><input type="text" id="f-jenis-tinggal" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Alat Transportasi</label><input type="text" id="f-transportasi" class="w-full p-2 border rounded"></div>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
-                    <h5 class="font-bold text-gray-800 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-house-user mr-1"></i> 3. Alamat Lengkap & Kontak</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <div class="md:col-span-2"><label class="block font-semibold mb-1">Alamat Jalan / Dusun</label><input type="text" id="f-alamat" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">RT / RW</label><div class="flex space-x-1"><input type="text" id="f-rt" placeholder="RT" class="w-1/2 p-2 border rounded"><input type="text" id="f-rw" placeholder="RW" class="w-1/2 p-2 border rounded"></div></div>
-                        <div><label class="block font-semibold mb-1">Kelurahan / Desa</label><input type="text" id="f-kelurahan" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Kecamatan</label><input type="text" id="f-kecamatan" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Kode Pos</label><input type="text" id="f-kode-pos" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">HP / WhatsApp</label><input type="text" id="f-hp" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">E-Mail</label><input type="email" id="f-email" class="w-full p-2 border rounded"></div>
-                    </div>
-                </div>
-
-                <div class="bg-amber-50/60 p-4 rounded-lg border space-y-3">
-                    <h5 class="font-bold text-amber-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-users mr-1"></i> 4. Data Orang Tua</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div><label class="block font-semibold mb-1">Nama Ayah</label><input type="text" id="f-nama-ayah" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">NIK Ayah</label><input type="text" id="f-nik-ayah" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Pekerjaan Ayah</label><input type="text" id="f-kerja-ayah" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Nama Ibu</label><input type="text" id="f-nama-ibu" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">NIK Ibu</label><input type="text" id="f-nik-ibu" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Pekerjaan Ibu</label><input type="text" id="f-kerja-ibu" class="w-full p-2 border rounded"></div>
-                    </div>
-                </div>
-
-                <div class="bg-emerald-50/60 p-4 rounded-lg border space-y-3">
-                    <h5 class="font-bold text-emerald-900 border-b pb-1 text-xs uppercase"><i class="fa-solid fa-hand-holding-dollar mr-1"></i> 5. Bantuan PIP/KIP & Rekening Bank</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div><label class="block font-semibold mb-1">Layak PIP (Usulan)</label><input type="text" id="f-layak-pip" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Penerima KIP</label><input type="text" id="f-penerima-kip" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Nomor KIP</label><input type="text" id="f-no-kip" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Bank Rekening</label><input type="text" id="f-bank" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">No Rekening Bank</label><input type="text" id="f-norek" class="w-full p-2 border rounded"></div>
-                        <div><label class="block font-semibold mb-1">Rekening Atas Nama</label><input type="text" id="f-an-bank" class="w-full p-2 border rounded"></div>
-                    </div>
-                </div>
-
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeFormModal()" class="bg-gray-400 text-white font-semibold px-4 py-2 rounded text-xs">Batal</button>
                     <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-2 rounded text-xs shadow">Simpan Data Siswa</button>
@@ -680,7 +707,7 @@
         </div>
     </div>
 
-    <!-- Modal Detail Admin (68 Poin Lengkap) -->
+    <!-- Modal Detail Admin (68 Poin Lengkap Dapodik) -->
     <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -701,15 +728,10 @@
     </footer>
 
     <script>
-        // FUNGSI VERIFIKASI PIN ADMIN
         function verifyPin(e) {
             if(e) e.preventDefault();
             document.getElementById('modal-pin').classList.add('hidden');
-            try {
-                sessionStorage.setItem('admin_logged_in', 'true');
-            } catch(err) {
-                console.log('SessionStorage bypass active');
-            }
+            try { sessionStorage.setItem('admin_logged_in', 'true'); } catch(err) {}
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -737,7 +759,6 @@
         let allMutasi = {};
         let allAlumni = {};
 
-        // Debounce timer untuk pencarian tanpa lag
         let searchSiswaDebounce = null;
         let searchGuruDebounce = null;
 
@@ -759,7 +780,6 @@
             return `${cleanNisn}_${cleanTp}_${cleanSmt}`;
         }
 
-        // OPTIMASI: Menggunakan 'value' terpadu secara efisien
         db.ref('siswa').on('value', snapshot => {
             allSiswa = snapshot.val() || {};
             updateAdminTahunDropdown();
@@ -788,7 +808,6 @@
             const currentSelected = selectTP.value;
             let tpSet = new Set();
             Object.values(allSiswa).forEach(s => { if(s.tahun_pelajaran) tpSet.add(s.tahun_pelajaran.trim()); });
-
             const sortedTP = Array.from(tpSet).sort().reverse();
             selectTP.innerHTML = '<option value="">Semua Tahun</option>';
             sortedTP.forEach(tp => {
@@ -804,7 +823,6 @@
             const currentSelected = selectTP.value;
             let tpSet = new Set();
             Object.values(allGuru).forEach(g => { if(g.tahun_pelajaran) tpSet.add(g.tahun_pelajaran.trim()); });
-
             const sortedTP = Array.from(tpSet).sort().reverse();
             selectTP.innerHTML = '<option value="">Semua Tahun</option>';
             sortedTP.forEach(tp => {
@@ -820,7 +838,6 @@
             const currentSelected = selectThn.value;
             let thnSet = new Set();
             Object.values(allAlumni).forEach(a => { if(a.tahun_lulus) thnSet.add(a.tahun_lulus.trim()); });
-
             const sortedThn = Array.from(thnSet).sort().reverse();
             selectThn.innerHTML = '<option value="">Semua Tahun</option>';
             sortedThn.forEach(thn => {
@@ -831,7 +848,6 @@
             });
         }
 
-        // OPTIMASI UTAMA: Batch Render string HTML untuk tabel siswa (Anti-Freeze)
         function renderTableAdmin() {
             const tbody = document.getElementById('tbl-admin-siswa');
             const search = document.getElementById('search-admin').value.toLowerCase();
@@ -840,20 +856,16 @@
             const filterKelas = document.getElementById('admin-filter-kelas').value;
 
             const keys = Object.keys(allSiswa);
-
             const filtered = keys.filter(k => {
                 const s = allSiswa[k];
                 if((s.status || "Aktif") !== "Aktif") return false;
-
                 const matchTP = filterTP === "" || (s.tahun_pelajaran || "2025/2026") === filterTP;
                 const matchSMT = filterSMT === "" || (s.semester || "Ganjil") === filterSMT;
                 const rombelStr = (s.rombel || s.kelas || '').toString();
                 const matchKelas = filterKelas === "" || rombelStr.includes(filterKelas);
-                
                 const matchSearch = (s.nama || '').toLowerCase().includes(search) || 
                                     (s.nisn || '').toString().includes(search) || 
                                     (s.nik || '').toString().includes(search);
-
                 return matchTP && matchSMT && matchKelas && matchSearch;
             });
 
@@ -885,18 +897,15 @@
                     </tr>
                 `;
             });
-
-            tbody.innerHTML = htmlBuffer; // Hanya 1x manipulasi DOM
+            tbody.innerHTML = htmlBuffer;
             updateDeleteGroupButton();
         }
 
-        // Event pencarian siswa dengan Debounce
         document.getElementById('search-admin').addEventListener('input', () => {
             clearTimeout(searchSiswaDebounce);
             searchSiswaDebounce = setTimeout(renderTableAdmin, 250);
         });
 
-        // OPTIMASI: Batch Render tabel Alumni
         function renderTableAlumni() {
             const tbody = document.getElementById('tbl-admin-alumni');
             const filterThn = document.getElementById('admin-filter-alumni-thn').value;
@@ -924,6 +933,7 @@
                         <td class="p-2 border font-mono">${a.no_ijazah || '-'}</td>
                         <td class="p-2 border text-center space-x-1">
                             <button onclick="previewSKHU('${k}')" class="bg-indigo-700 hover:bg-indigo-800 text-white px-2.5 py-1 rounded text-[10px]"><i class="fa-solid fa-print mr-1"></i> Cetak SKHU</button>
+                            <button onclick="openModalEditAlumni('${k}')" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold px-2.5 py-1 rounded text-[10px]"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
                             <button onclick="deleteAlumni('${k}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]">Hapus</button>
                         </td>
                     </tr>
@@ -932,16 +942,17 @@
             tbody.innerHTML = htmlBuffer;
         }
 
-        // KENAIKAN KELAS INTERAKTIF DENGAN CHECKBOX
+        // KENAIKAN KELAS INTERAKTIF DENGAN CHECKBOX (DIPERBAIKI)
         function openModalKenaikanKelas() {
             document.getElementById('modal-kenaikan').classList.remove('hidden');
+            loadSiswaKenaikanKelas();
         }
 
         function closeModalKenaikan() { document.getElementById('modal-kenaikan').classList.add('hidden'); }
 
         function loadSiswaKenaikanKelas() {
             const kelasAsal = document.getElementById('kn-kelas-asal').value;
-            const tpAsal = document.getElementById('kn-asal-tp').value;
+            const tpAsal = document.getElementById('kn-asal-tp').value.trim();
             const listDiv = document.getElementById('list-siswa-kenaikan');
 
             if(!kelasAsal) {
@@ -954,18 +965,18 @@
 
             Object.keys(allSiswa).forEach(k => {
                 const s = allSiswa[k];
-                const rombel = (s.rombel || s.kelas || '').toString();
+                const rombel = (s.rombel || s.kelas || '').toString().trim();
                 const status = s.status || "Aktif";
-                const tp = s.tahun_pelajaran || "2025/2026";
+                const tp = (s.tahun_pelajaran || "2025/2026").trim();
 
-                if(rombel.includes(kelasAsal) && status === "Aktif" && tp === tpAsal) {
+                if(rombel.toLowerCase().includes(kelasAsal.toLowerCase()) && status === "Aktif") {
                     count++;
                     html += `
                         <label class="flex items-center justify-between p-2 bg-white rounded border hover:bg-blue-50 cursor-pointer">
                             <div class="flex items-center space-x-2">
                                 <input type="checkbox" value="${k}" checked class="chk-naik-kelas w-4 h-4 text-blue-600 rounded">
                                 <span class="font-bold text-gray-800">${s.nama}</span>
-                                <span class="text-gray-400 text-[10px] font-mono">(NISN: ${s.nisn})</span>
+                                <span class="text-gray-400 text-[10px] font-mono">(NISN: ${s.nisn || '-'})</span>
                             </div>
                             <span class="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Default: Naik Kelas</span>
                         </label>
@@ -974,7 +985,7 @@
             });
 
             if(count === 0) {
-                listDiv.innerHTML = `<p class="text-rose-600 text-center py-4">Tidak ada siswa aktif ditemukan pada ${kelasAsal} (TP: ${tpAsal}).</p>`;
+                listDiv.innerHTML = `<p class="text-rose-600 text-center py-4">Tidak ada siswa aktif ditemukan pada ${kelasAsal}.</p>`;
             } else {
                 listDiv.innerHTML = html;
             }
@@ -1031,7 +1042,7 @@
             });
         }
 
-        // MATA PELAJARAN & KELULUSAN DINAMIS
+        // KELULUSAN & TRANSKRIP NILAI
         const defaultMapel = [
             "Pendidikan Agama dan Budi Pekerti",
             "Pendidikan Pancasila",
@@ -1046,7 +1057,6 @@
         function openModalKelulusanMassal() {
             const select = document.getElementById('kl-select-siswa');
             let opts = '<option value="">-- Pilih Siswa Kelas 6 --</option>';
-            
             Object.keys(allSiswa).forEach(k => {
                 const s = allSiswa[k];
                 const rombel = (s.rombel || s.kelas || '').toString();
@@ -1054,13 +1064,9 @@
                     opts += `<option value="${k}">${s.nama} (NISN: ${s.nisn})</option>`;
                 }
             });
-
             select.innerHTML = opts;
-
-            const container = document.getElementById('container-mapel-dinamis');
-            container.innerHTML = '';
+            document.getElementById('container-mapel-dinamis').innerHTML = '';
             defaultMapel.forEach(m => addMapelRow(m, "80.00"));
-
             document.getElementById('modal-kelulusan').classList.remove('hidden');
         }
 
@@ -1069,7 +1075,6 @@
         function addMapelRow(nama = "", nilai = "") {
             const container = document.getElementById('container-mapel-dinamis');
             const rowId = 'row-mapel-' + Date.now() + Math.random().toString(36).substr(2, 4);
-            
             const div = document.createElement('div');
             div.id = rowId;
             div.className = "flex items-center space-x-2 bg-white p-2 rounded border";
@@ -1095,6 +1100,8 @@
 
             const thnLulus = document.getElementById('kl-thn-lulus').value;
             const noIjazah = document.getElementById('kl-no-ijazah').value;
+            const namaKs = document.getElementById('kl-nama-ks').value;
+            const nipKs = document.getElementById('kl-nip-ks').value;
 
             let mapelList = [];
             const rowsName = document.querySelectorAll('.mapel-nama');
@@ -1103,15 +1110,15 @@
             for(let i=0; i<rowsName.length; i++) {
                 const name = rowsName[i].value.trim();
                 const val = parseFloat(rowsVal[i].value) || 0;
-                if(name) {
-                    mapelList.push({ name: name, nilai: val });
-                }
+                if(name) { mapelList.push({ name: name, nilai: val }); }
             }
 
             const alumniData = {
                 ...s,
                 tahun_lulus: thnLulus,
                 no_ijazah: noIjazah,
+                nama_ks: namaKs,
+                nip_ks: nipKs,
                 mapel_dinamis: mapelList,
                 status: "Lulus"
             };
@@ -1121,6 +1128,87 @@
 
             alert(`Siswa ${s.nama} berhasil diluluskan dan tersimpan di arsip alumni!`);
             closeModalKelulusan();
+        }
+
+        // FITUR EDIT ALUMNI
+        function openModalEditAlumni(key) {
+            const a = allAlumni[key];
+            if(!a) return;
+
+            document.getElementById('ea-siswa-key').value = key;
+            document.getElementById('ea-nama-display').value = `${a.nama || '-'} (NISN: ${a.nisn || '-'})`;
+            document.getElementById('ea-thn-lulus').value = a.tahun_lulus || '2025/2026';
+            document.getElementById('ea-no-ijazah').value = a.no_ijazah || '';
+            document.getElementById('ea-nama-ks').value = a.nama_ks || 'Muhlisin, S.Pd.';
+            document.getElementById('ea-nip-ks').value = a.nip_ks || '198507242010011001';
+
+            const container = document.getElementById('container-edit-mapel-dinamis');
+            container.innerHTML = '';
+            
+            const listMapel = a.mapel_dinamis || [];
+            if(listMapel.length > 0) {
+                listMapel.forEach(m => addEditMapelRow(m.name, m.nilai));
+            } else {
+                defaultMapel.forEach(m => addEditMapelRow(m, "80.00"));
+            }
+
+            document.getElementById('modal-edit-alumni').classList.remove('hidden');
+        }
+
+        function closeModalEditAlumni() { document.getElementById('modal-edit-alumni').classList.add('hidden'); }
+
+        function addEditMapelRow(nama = "", nilai = "") {
+            const container = document.getElementById('container-edit-mapel-dinamis');
+            const rowId = 'edit-row-' + Date.now() + Math.random().toString(36).substr(2, 4);
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = "flex items-center space-x-2 bg-white p-2 rounded border";
+            div.innerHTML = `
+                <input type="text" value="${nama}" placeholder="Nama Mata Pelajaran" class="ea-mapel-nama w-2/3 p-1.5 border rounded text-xs font-semibold">
+                <input type="number" step="0.01" value="${nilai}" placeholder="Nilai" class="ea-mapel-nilai w-1/3 p-1.5 border rounded text-xs font-mono font-bold text-center">
+                <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-rose-600 hover:text-rose-800 font-bold px-2 text-sm">&times;</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function handleUpdateAlumni(e) {
+            e.preventDefault();
+            const key = document.getElementById('ea-siswa-key').value;
+            const a = allAlumni[key];
+            if(!a) return;
+
+            const thnLulus = document.getElementById('ea-thn-lulus').value;
+            const noIjazah = document.getElementById('ea-no-ijazah').value;
+            const namaKs = document.getElementById('ea-nama-ks').value;
+            const nipKs = document.getElementById('ea-nip-ks').value;
+
+            let mapelList = [];
+            const rowsName = document.querySelectorAll('.ea-mapel-nama');
+            const rowsVal = document.querySelectorAll('.ea-mapel-nilai');
+
+            for(let i=0; i<rowsName.length; i++) {
+                const name = rowsName[i].value.trim();
+                const val = parseFloat(rowsVal[i].value) || 0;
+                if(name) { mapelList.push({ name: name, nilai: val }); }
+            }
+
+            const updatedAlumniData = {
+                ...a,
+                tahun_lulus: thnLulus,
+                no_ijazah: noIjazah,
+                nama_ks: namaKs,
+                nip_ks: nipKs,
+                mapel_dinamis: mapelList
+            };
+
+            db.ref('alumni/' + key).set(updatedAlumniData, err => {
+                if(!err) {
+                    alert('Data arsip alumni & transkrip nilai berhasil diperbarui!');
+                    closeModalEditAlumni();
+                } else {
+                    alert('Gagal memperbarui data: ' + err.message);
+                }
+            });
         }
 
         function previewSKHU(key) {
@@ -1134,8 +1222,10 @@
             document.getElementById('sk-thn').innerText = a.tahun_lulus || '-';
             document.getElementById('sk-tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
+            document.getElementById('sk-nama-ks').innerText = a.nama_ks || 'Muhlisin, S.Pd.';
+            document.getElementById('sk-nip-ks').innerText = `NIP. ${a.nip_ks || '198507242010011001'}`;
+
             const tbody = document.getElementById('sk-tbody-nilai');
-            
             let totalNilai = 0;
             const listMapel = a.mapel_dinamis || [];
 
@@ -1178,7 +1268,6 @@
             keys.forEach(k => {
                 const s = allSiswa[k];
                 if((s.status || "Aktif") !== "Aktif") return;
-
                 const matchTP = filterTP === "" || (s.tahun_pelajaran || "2025/2026") === filterTP;
                 const matchSMT = filterSMT === "" || (s.semester || "Ganjil") === filterSMT;
                 const rombelStr = (s.rombel || s.kelas || '').toString();
@@ -1203,7 +1292,6 @@
             XLSX.writeFile(workbook, `Data_Siswa_SDN03Limbangan.xlsx`);
         }
 
-        // OPTIMASI: Batch Render tabel Guru
         function renderTableGuruAdmin() {
             const tbody = document.getElementById('tbl-admin-guru');
             const search = document.getElementById('search-guru-admin').value.toLowerCase();
@@ -1211,7 +1299,6 @@
             const filterSMT = document.getElementById('admin-filter-guru-smt').value;
 
             const keys = Object.keys(allGuru);
-
             const filtered = keys.filter(k => {
                 const g = allGuru[k];
                 const matchTP = filterTP === "" || (g.tahun_pelajaran || "2025/2026") === filterTP;
@@ -1250,7 +1337,6 @@
             tbody.innerHTML = htmlBuffer;
         }
 
-        // Event pencarian guru dengan Debounce
         document.getElementById('search-guru-admin').addEventListener('input', () => {
             clearTimeout(searchGuruDebounce);
             searchGuruDebounce = setTimeout(renderTableGuruAdmin, 250);
@@ -1270,7 +1356,6 @@
             if(!g) return;
             document.getElementById('form-guru-title').innerText = `Edit Data Guru: ${g.nama || ''}`;
             document.getElementById('fg-record-key').value = key;
-
             document.getElementById('fg-tp').value = g.tahun_pelajaran || '2025/2026';
             document.getElementById('fg-smt').value = g.semester || 'Ganjil';
             document.getElementById('fg-nip').value = g.nip || '';
@@ -1284,7 +1369,6 @@
             document.getElementById('fg-tmt').value = g.tmt || '';
             document.getElementById('fg-jabatan').value = g.jabatan || '';
             document.getElementById('fg-status-peg').value = g.status_peg || '';
-
             document.getElementById('modal-form-guru').classList.remove('hidden');
         }
 
@@ -1320,9 +1404,7 @@
             });
         }
 
-        function deleteSingleGuru(key) {
-            if(confirm('Yakin hapus data guru ini?')) db.ref('guru/' + key).remove();
-        }
+        function deleteSingleGuru(key) { if(confirm('Yakin hapus data guru ini?')) db.ref('guru/' + key).remove(); }
 
         function toggleSelectAll(master) {
             document.querySelectorAll('.chk-siswa').forEach(cb => cb.checked = master.checked);
@@ -1344,9 +1426,7 @@
             }
         }
 
-        function deleteSingleSiswa(key) {
-            if(confirm('Yakin hapus data siswa ini?')) db.ref('siswa/' + key).remove();
-        }
+        function deleteSingleSiswa(key) { if(confirm('Yakin hapus data siswa ini?')) db.ref('siswa/' + key).remove(); }
 
         function openFormTambah() {
             document.getElementById('form-siswa').reset();
@@ -1362,7 +1442,6 @@
             if(!s) return;
             document.getElementById('form-modal-title').innerText = `Edit Data Siswa: ${s.nama || ''}`;
             document.getElementById('f-record-key').value = key;
-
             document.getElementById('f-tp').value = s.tahun_pelajaran || '2025/2026';
             document.getElementById('f-smt').value = s.semester || 'Ganjil';
             document.getElementById('f-nisn').value = s.nisn || '';
@@ -1377,39 +1456,6 @@
             document.getElementById('f-agama').value = s.agama || '';
             document.getElementById('f-akta').value = s.akta || '';
             document.getElementById('f-sekolah-asal').value = s.sekolah_asal || '';
-
-            document.getElementById('f-tb').value = s.tb || '';
-            document.getElementById('f-bb').value = s.bb || '';
-            document.getElementById('f-lingkar-kepala').value = s.lingkar_kepala || '';
-            document.getElementById('f-anak-ke').value = s.anak_ke || '';
-            document.getElementById('f-jml-saudara').value = s.jml_saudara || '';
-            document.getElementById('f-kebutuhan-khusus').value = s.kebutuhan_khusus || '';
-            document.getElementById('f-jenis-tinggal').value = s.jenis_tinggal || '';
-            document.getElementById('f-transportasi').value = s.transportasi || '';
-
-            document.getElementById('f-alamat').value = s.alamat || '';
-            document.getElementById('f-rt').value = s.rt || '';
-            document.getElementById('f-rw').value = s.rw || '';
-            document.getElementById('f-kelurahan').value = s.kelurahan || '';
-            document.getElementById('f-kecamatan').value = s.kecamatan || '';
-            document.getElementById('f-kode-pos').value = s.kode_pos || '';
-            document.getElementById('f-hp').value = s.hp || '';
-            document.getElementById('f-email').value = s.email || '';
-
-            document.getElementById('f-nama-ayah').value = s.nama_ayah || '';
-            document.getElementById('f-nik-ayah').value = s.nik_ayah || '';
-            document.getElementById('f-kerja-ayah').value = s.kerja_ayah || '';
-            document.getElementById('f-nama-ibu').value = s.nama_ibu || s.ibu || '';
-            document.getElementById('f-nik-ibu').value = s.nik_ibu || '';
-            document.getElementById('f-kerja-ibu').value = s.kerja_ibu || '';
-
-            document.getElementById('f-layak-pip').value = s.layak_pip || '';
-            document.getElementById('f-penerima-kip').value = s.penerima_kip || '';
-            document.getElementById('f-no-kip').value = s.no_kip || '';
-            document.getElementById('f-bank').value = s.bank || '';
-            document.getElementById('f-norek').value = s.norek || '';
-            document.getElementById('f-an-bank').value = s.an_bank || '';
-
             document.getElementById('modal-form-siswa').classList.remove('hidden');
         }
 
@@ -1438,34 +1484,6 @@
                 agama: document.getElementById('f-agama').value,
                 akta: document.getElementById('f-akta').value,
                 sekolah_asal: document.getElementById('f-sekolah-asal').value,
-                tb: document.getElementById('f-tb').value,
-                bb: document.getElementById('f-bb').value,
-                lingkar_kepala: document.getElementById('f-lingkar-kepala').value,
-                anak_ke: document.getElementById('f-anak-ke').value,
-                jml_saudara: document.getElementById('f-jml-saudara').value,
-                kebutuhan_khusus: document.getElementById('f-kebutuhan-khusus').value,
-                jenis_tinggal: document.getElementById('f-jenis-tinggal').value,
-                transportasi: document.getElementById('f-transportasi').value,
-                alamat: document.getElementById('f-alamat').value,
-                rt: document.getElementById('f-rt').value,
-                rw: document.getElementById('f-rw').value,
-                kelurahan: document.getElementById('f-kelurahan').value,
-                kecamatan: document.getElementById('f-kecamatan').value,
-                kode_pos: document.getElementById('f-kode-pos').value,
-                hp: document.getElementById('f-hp').value,
-                email: document.getElementById('f-email').value,
-                nama_ayah: document.getElementById('f-nama-ayah').value,
-                nik_ayah: document.getElementById('f-nik-ayah').value,
-                kerja_ayah: document.getElementById('f-kerja-ayah').value,
-                nama_ibu: document.getElementById('f-nama-ibu').value,
-                nik_ibu: document.getElementById('f-nik-ibu').value,
-                kerja_ibu: document.getElementById('f-kerja-ibu').value,
-                layak_pip: document.getElementById('f-layak-pip').value,
-                penerima_kip: document.getElementById('f-penerima-kip').value,
-                no_kip: document.getElementById('f-no-kip').value,
-                bank: document.getElementById('f-bank').value,
-                norek: document.getElementById('f-norek').value,
-                an_bank: document.getElementById('f-an-bank').value,
                 status: existing.status || "Aktif"
             };
 
@@ -1523,26 +1541,16 @@
             const key = makeKey(nisn, tp, smt);
 
             const studentData = {
-                nisn: nisn,
-                nama: nama,
-                jk: document.getElementById('mm-jk').value,
-                rombel: rombel,
-                tahun_pelajaran: tp,
-                semester: smt,
-                sekolah_asal: document.getElementById('mm-sekolah').value,
-                status: "Aktif"
+                nisn: nisn, nama: nama, jk: document.getElementById('mm-jk').value,
+                rombel: rombel, tahun_pelajaran: tp, semester: smt,
+                sekolah_asal: document.getElementById('mm-sekolah').value, status: "Aktif"
             };
-
             const mutasiData = {
-                nisn: nisn,
-                nama_siswa: nama,
-                jenis_mutasi: "Masuk",
+                nisn: nisn, nama_siswa: nama, jenis_mutasi: "Masuk",
                 tgl_mutasi: document.getElementById('mm-tgl').value,
                 sekolah_tujuan_asal: document.getElementById('mm-sekolah').value,
                 alasan: document.getElementById('mm-alasan').value,
-                rombel: rombel,
-                tahun_pelajaran: tp,
-                semester: smt
+                rombel: rombel, tahun_pelajaran: tp, semester: smt
             };
 
             db.ref('siswa/' + key).set(studentData);
@@ -1551,21 +1559,18 @@
             closeModalMutasiMasuk();
         }
 
-        // OPTIMASI: Batch Render tabel Mutasi
         function renderTableMutasi() {
             const tbody = document.getElementById('tbl-admin-mutasi');
+            tbody.innerHTML = '';
             const keys = Object.keys(allMutasi);
-
             if(keys.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">Belum ada data mutasi.</td></tr>';
                 return;
             }
-
             let htmlBuffer = '';
             keys.forEach(k => {
                 const m = allMutasi[k];
                 const badgeClass = m.jenis_mutasi === "Masuk" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
-
                 htmlBuffer += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-2 border font-bold"><span class="px-2 py-0.5 rounded ${badgeClass}">${m.jenis_mutasi}</span></td>
@@ -1580,7 +1585,6 @@
                     </tr>
                 `;
             });
-
             tbody.innerHTML = htmlBuffer;
         }
 
@@ -1592,18 +1596,7 @@
         }
 
         function downloadTemplateExcel() {
-            const headers = [
-                "Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", 
-                "Alamat", "RT", "RW", "Dusun", "Kelurahan", "Kecamatan", "Kode Pos", "Jenis Tinggal", 
-                "Alat Transportasi", "Telepon", "HP", "E-Mail", "SKHUN", "Penerima KPS", "No. KPS", 
-                "Nama Ayah", "Tahun Lahir Ayah", "Jenjang Pendidikan Ayah", "Pekerjaan Ayah", "Penghasilan Ayah", "NIK Ayah", 
-                "Nama Ibu", "Tahun Lahir Ibu", "Jenjang Pendidikan Ibu", "Pekerjaan Ibu", "Penghasilan Ibu", "NIK Ibu", 
-                "Nama Wali", "Tahun Lahir Wali", "Jenjang Pendidikan Wali", "Pekerjaan Wali", "Penghasilan Wali", "NIK Wali", 
-                "Rombel Saat Ini", "No Peserta Ujian Nasional", "No Seri Ijazah", "Penerima KIP", "Nomor KIP", "Nama di KIP", 
-                "Nomor KKS", "No Registrasi Akta Lahir", "Bank", "Nomor Rekening Bank", "Rekening Atas Nama", 
-                "Layak PIP (usulan dari sekolah)", "Alasan Layak PIP", "Kebutuhan Khusus", "Sekolah Asal", "Anak ke-berapa", 
-                "Lintang", "Bujur", "No KK", "Tinggi Badan", "Berat Badan", "Lingkar Kepala", "Jml. Saudara Kandung", "Jarak Rumah ke Sekolah (KM)"
-            ];
+            const headers = ["Tahun Pelajaran", "Semester", "No", "Nama", "NIPD", "JK", "NISN", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama", "Alamat"];
             const worksheet = XLSX.utils.aoa_to_sheet([headers]);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Template Siswa");
@@ -1632,7 +1625,6 @@
                 }
                 const headers = rows[headerIdx].map(h => h.toString().trim());
                 let updateObject = {}, count = 0;
-
                 for(let i = headerIdx + 1; i < rows.length; i++) {
                     const rowData = rows[i];
                     if(!rowData || rowData.length === 0) continue;
@@ -1647,25 +1639,14 @@
                     const nama = getVal(['nama', 'Nama']);
                     const nisnVal = getVal(['nisn', 'NISN']);
                     if(!nama && !nisnVal) continue;
-
-                    const nisn = (nisnVal || ('S_' + Date.now() + Math.random().toString().substr(2,4))).toString().trim();
+                    const nisn = (nisnVal || ('S_' + Date.now())).toString().trim();
                     const tp = (getVal(['tahun pelajaran', 'tp']) || "2025/2026").toString().trim();
                     const smt = (getVal(['semester', 'smt']) || "Ganjil").toString().trim();
                     const recordKey = makeKey(nisn, tp, smt);
                     const currentExist = allSiswa[recordKey] || {};
-
                     updateObject[recordKey] = {
-                        ...currentExist,
-                        tahun_pelajaran: tp, semester: smt, nisn: nisn,
-                        nama: nama || currentExist.nama,
-                        nipd: getVal(['nipd', 'NIPD']) || currentExist.nipd || "",
-                        jk: getVal(['jk', 'JK']) || currentExist.jk || "",
-                        tempat_lahir: getVal(['tempat lahir']) || currentExist.tempat_lahir || "",
-                        tgl_lahir: getVal(['tanggal lahir']) || currentExist.tgl_lahir || "",
-                        nik: getVal(['nik', 'NIK']) || currentExist.nik || "",
-                        rombel: getVal(['rombel saat ini', 'kelas']) || currentExist.rombel || "Kelas 1",
-                        nama_ayah: getVal(['nama ayah']) || currentExist.nama_ayah || "",
-                        status: currentExist.status || "Aktif"
+                        ...currentExist, tahun_pelajaran: tp, semester: smt, nisn: nisn,
+                        nama: nama || currentExist.nama, status: currentExist.status || "Aktif"
                     };
                     count++;
                 }
@@ -1689,7 +1670,6 @@
                 }
                 const headers = rows[headerIdx].map(h => h.toString().trim());
                 let updateGuru = {}, count = 0;
-
                 for(let i = headerIdx + 1; i < rows.length; i++) {
                     const rowData = rows[i];
                     if(!rowData || rowData.length === 0) continue;
@@ -1704,24 +1684,13 @@
                     const nipVal = getVal(['nip', 'nuptk']);
                     const nama = getVal(['nama', 'nama guru']);
                     if(!nipVal && !nama) continue;
-
                     const nip = (nipVal || ('G_' + Date.now())).toString().trim();
                     const tp = (getVal(['tahun pelajaran', 'tp']) || "2025/2026").toString().trim();
                     const smt = (getVal(['semester', 'smt']) || "Ganjil").toString().trim();
                     const recordKey = makeKey(nip, tp, smt);
                     const currentExist = allGuru[recordKey] || {};
-
                     updateGuru[recordKey] = {
-                        ...currentExist,
-                        nip: nip, nik: getVal(['nik']) || currentExist.nik || "",
-                        nama: nama || currentExist.nama || "Guru",
-                        jk: getVal(['jk']) || currentExist.jk || "L",
-                        tempat_lahir: getVal(['tempat lahir']) || currentExist.tempat_lahir || "",
-                        tgl_lahir: getVal(['tanggal lahir']) || currentExist.tgl_lahir || "",
-                        tmt: getVal(['tmt']) || currentExist.tmt || "",
-                        jabatan: getVal(['jabatan']) || currentExist.jabatan || "Guru",
-                        status_peg: getVal(['status kepegawaian']) || currentExist.status_peg || "PNS",
-                        hp: getVal(['hp', 'telepon']) || currentExist.hp || "",
+                        ...currentExist, nip: nip, nama: nama || currentExist.nama || "Guru",
                         tahun_pelajaran: tp, semester: smt
                     };
                     count++;
@@ -1733,7 +1702,7 @@
             reader.readAsArrayBuffer(fileInput.files[0]);
         }
 
-        // FUNGSI DETAIL LENGKAP 68 POIN ATRIBUT SISWA
+        // FUNGSI DETAIL LENGKAP 68 POIN ATRIBUT SISWA DAPODIK (DIKEMBALIKAN UTUH)
         function showDetail(key) {
             const s = allSiswa[key];
             if(!s) return;
